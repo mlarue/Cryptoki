@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+PKCS11.xs
+ppport.h
+README
+t/Lib-PKCS11.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Lib/PKCS11.pm

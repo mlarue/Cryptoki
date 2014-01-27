@@ -28,7 +28,7 @@ for my $id ( @$slots ) {
 }
 
 my $session = -1;
-is $f->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,$session), CKR_OK, 'C_OpenSession';
+is rv_to_str($f->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,$session)), 'CKR_OK', 'C_OpenSession';
 diag $session;
 
 my $sessionInfo = {};
@@ -83,8 +83,6 @@ is rv_to_str($f->C_GenerateKeyPair(
 	$private_key
 )), 'CKR_OK', 'C_GenerateKeyPair';
 
-diag $public_key;
-diag $private_key;
 
 
 is rv_to_str($f->C_EncryptInit(
@@ -93,14 +91,17 @@ is rv_to_str($f->C_EncryptInit(
 	$public_key, 
 )), 'CKR_OK', 'C_EncryptInit';
 
+my $plain_text = 'plain text';
 my $encrypted_text = '';
+my $encrypted_text_len = 0;
 is rv_to_str($f->C_Encrypt(
 	$session, 
-	'plain text',
-	$encrypted_text
+	$plain_text,
+	length($plain_text),
+	$encrypted_text,
+	$encrypted_text_len
 )), 'CKR_OK', 'C_Encrypt';
 diag unpack('H*',$encrypted_text);
-
 
 is rv_to_str($f->C_DecryptInit(
 	$session, 
@@ -110,13 +111,56 @@ is rv_to_str($f->C_DecryptInit(
 
 
 my $decrypted_text = '';
+my $decrypted_text_len = 0;
 is rv_to_str($f->C_Decrypt(
 	$session, 
 	$encrypted_text,
-	$decrypted_text
+	$encrypted_text_len,
+	$decrypted_text,
+	$decrypted_text_len,
 )), 'CKR_OK', 'C_Decrypt';
 diag $decrypted_text;
 
+is $decrypted_text, $plain_text, 'decrypt: "plain text"';
+
+
+is rv_to_str($f->C_SignInit(
+	$session, 
+	[ CKM_SHA256_RSA_PKCS, NULL_PTR, 0 ], 
+	$private_key, 
+)), 'CKR_OK', 'C_SignInit';
+
+my $signature = '';
+my $signature_len = 0;
+is rv_to_str($f->C_Sign(
+	$session, 
+	$plain_text,
+	length($plain_text),
+	$signature,
+	$signature_len,
+)), 'CKR_OK', 'C_Sign';
+diag unpack('H*',$signature);
+diag $signature_len;
+
+
+is rv_to_str($f->C_VerifyInit(
+	$session, 
+	[ CKM_SHA256_RSA_PKCS, NULL_PTR, 0 ], 
+	$public_key, 
+)), 'CKR_OK', 'C_VerifyInit';
+
+is rv_to_str($f->C_Verify(
+	$session, 
+	$plain_text,
+	length($plain_text),
+	$signature,
+	$signature_len,
+)), 'CKR_OK', 'C_Verify';
+
+
+
+is $f->C_DestroyObject($session, $public_key), CKR_OK, 'destroy public key';
+is $f->C_DestroyObject($session, $private_key), CKR_OK, 'destroy private key';
 
 
 done_testing();

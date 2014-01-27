@@ -64,7 +64,7 @@ CODE:
 		RETVAL = fl->C_GetSlotList(tokenPresent,_pSlotList,&pulCount);
 
 		if ( RETVAL == CKR_OK ) {
-			unsigned int i;
+			unsigned int i = 0;
 			for(i=0;i<pulCount;i++) {
 				av_push((AV*)pSlotList,newSViv(_pSlotList[i]));
 			}
@@ -207,7 +207,7 @@ CODE:
 	_pMechanism.ulParameterLen = 0; 
 
 	Newxz(_pPublicKeyTemplate, av_top_index(pPublicKeyTemplate)+1, CK_ATTRIBUTE);
-	int i;
+	int i = 0;
 	for(i=0;i<=av_top_index(pPublicKeyTemplate);++i){
 		SV** elem = av_fetch(pPublicKeyTemplate, i, 0);
 		if ( elem != NULL ) {
@@ -278,26 +278,30 @@ OUTPUT:
 
 
 CK_RV
-C_Encrypt(fl,hSession,pData,pEncryptedData)
+C_Encrypt(fl,hSession,pData,ulDataLen,pEncryptedData,ulEncryptedDataLen)
 	Cryptoki::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	char* 					pData
-	char* 					pEncryptedData
+	CK_ULONG				ulDataLen
+	SV* 					pEncryptedData
+	CK_ULONG				ulEncryptedDataLen
 CODE:
-	CK_ULONG ulDataLen = strlen(pData);
-	CK_ULONG ulEncryptedDataLen = 0;
-
 	RETVAL = fl->C_Encrypt(hSession,(CK_BYTE_PTR)pData,ulDataLen,
 		NULL_PTR,&ulEncryptedDataLen);
 	if ( RETVAL==CKR_OK ) {
-		Newx(pEncryptedData,ulEncryptedDataLen,char);
+		CK_BYTE_PTR _pEncryptedData;
+		Newx(_pEncryptedData,ulEncryptedDataLen,CK_BYTE);
 		RETVAL = fl->C_Encrypt(hSession,(CK_BYTE_PTR)pData,ulDataLen,
-			(CK_BYTE_PTR)pEncryptedData,&ulEncryptedDataLen);
+			_pEncryptedData,&ulEncryptedDataLen);
+
+		if ( RETVAL==CKR_OK ) {
+			*pEncryptedData = *newSVpv((char*)_pEncryptedData,ulEncryptedDataLen);
+		}
 	}
 OUTPUT:
 	RETVAL
 	pEncryptedData
-
+	ulEncryptedDataLen
 
 
 
@@ -319,26 +323,122 @@ OUTPUT:
 
 
 CK_RV
-C_Decrypt(fl,hSession,pEncryptedData,pData)
+C_Decrypt(fl,hSession,pEncryptedData,ulEncryptedDataLen,pData,ulDataLen)
 	Cryptoki::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	char* 					pEncryptedData
-	char* 					pData
+	CK_ULONG				ulEncryptedDataLen
+	SV* 					pData
+	CK_ULONG				ulDataLen
 CODE:
-	// TODO: replace strlen, \0 contained...
-	CK_ULONG ulEncryptedDataLen = strlen(pEncryptedData);
-	CK_ULONG ulDataLen = 0;
-
 	RETVAL = fl->C_Decrypt(hSession,(CK_BYTE_PTR)pEncryptedData,ulEncryptedDataLen,
 		NULL_PTR,&ulDataLen);
 	if ( RETVAL==CKR_OK ) {
-		Newx(pData,ulDataLen,char);
+		CK_BYTE_PTR _pData;
+		Newx(_pData,ulDataLen,CK_BYTE);
 		RETVAL = fl->C_Decrypt(hSession,(CK_BYTE_PTR)pEncryptedData,ulEncryptedDataLen,
-			(CK_BYTE_PTR)pData,&ulDataLen);
+			_pData,&ulDataLen);
+
+		if ( RETVAL==CKR_OK ) {
+			*pData = *newSVpv((char*)_pData, ulDataLen);
+		}
 	}
 OUTPUT:
 	RETVAL
 	pData
+	ulDataLen
+
+
+
+CK_RV
+C_SignInit(fl,hSession,pMechanism,hKey)
+	Cryptoki::FunctionList	fl
+	CK_SESSION_HANDLE 		hSession
+	AV*				 		pMechanism
+	CK_OBJECT_HANDLE 		hKey
+CODE:
+	CK_MECHANISM	 		_pMechanism;
+	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
+	_pMechanism.pParameter = NULL_PTR;
+	_pMechanism.ulParameterLen = 0; 
+	RETVAL = fl->C_SignInit(hSession,&_pMechanism,hKey);
+OUTPUT:
+	RETVAL
+
+
+
+CK_RV
+C_Sign(fl,hSession,pData,ulDataLen,pSignature,ulSignatureLen)
+	Cryptoki::FunctionList	fl
+	CK_SESSION_HANDLE 		hSession
+	char* 					pData
+	CK_ULONG				ulDataLen
+	SV* 					pSignature
+	CK_ULONG				ulSignatureLen
+CODE:
+	RETVAL = fl->C_Sign(hSession,(CK_BYTE_PTR)pData,ulDataLen,
+		NULL_PTR,&ulSignatureLen);
+	if ( RETVAL==CKR_OK ) {
+		CK_BYTE_PTR _pSignature;
+		Newx(_pSignature,ulSignatureLen,CK_BYTE);
+		RETVAL = fl->C_Sign(hSession,(CK_BYTE_PTR)pData,ulDataLen,
+			_pSignature,&ulSignatureLen);
+
+		if ( RETVAL==CKR_OK ) {
+			*pSignature = *newSVpv((char*)_pSignature, ulSignatureLen);
+		}
+	}
+OUTPUT:
+	RETVAL
+	pSignature
+	ulSignatureLen
+
+
+
+CK_RV
+C_VerifyInit(fl,hSession,pMechanism,hKey)
+	Cryptoki::FunctionList	fl
+	CK_SESSION_HANDLE 		hSession
+	AV*				 		pMechanism
+	CK_OBJECT_HANDLE 		hKey
+CODE:
+	CK_MECHANISM	 		_pMechanism;
+	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
+	_pMechanism.pParameter = NULL_PTR;
+	_pMechanism.ulParameterLen = 0; 
+	RETVAL = fl->C_VerifyInit(hSession,&_pMechanism,hKey);
+OUTPUT:
+	RETVAL
+
+
+
+CK_RV
+C_Verify(fl,hSession,pData,ulDataLen,pSignature,ulSignatureLen)
+	Cryptoki::FunctionList	fl
+	CK_SESSION_HANDLE 		hSession
+	char* 					pData
+	CK_ULONG				ulDataLen
+	char* 					pSignature
+	CK_ULONG				ulSignatureLen
+CODE:
+	RETVAL = fl->C_Verify(hSession,(CK_BYTE_PTR)pData,ulDataLen,
+		(CK_BYTE_PTR)pSignature,ulSignatureLen);
+OUTPUT:
+	RETVAL
+
+
+
+
+CK_RV
+C_DestroyObject(fl,hSession,hObject)
+	Cryptoki::FunctionList	fl
+	CK_SESSION_HANDLE 		hSession
+	CK_OBJECT_HANDLE 		hObject
+CODE:
+	RETVAL = fl->C_DestroyObject(hSession,hObject);
+OUTPUT:
+	RETVAL
+
 
 
 

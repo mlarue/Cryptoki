@@ -44,6 +44,7 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	CKR_MECHANISM_INVALID
 	CKR_MECHANISM_PARAM_INVALID
 	CKR_OPERATION_ACTIVE
+	CKR_OPERATION_NOT_INITIALIZED
 	CKR_PIN_EXPIRED
 	CKR_SESSION_CLOSED
 	CKR_SESSION_HANDLE_INVALID
@@ -89,6 +90,10 @@ if  (eval {require ExtUtils::Constant; 1}) {
 
 	CKM_RSA_PKCS_KEY_PAIR_GEN
 	CKM_RSA_PKCS
+	CKM_SHA256_RSA_PKCS
+	CKM_SHA512_RSA_PKCS
+	CKM_SHA256
+	CKM_SHA512
   ));
   ExtUtils::Constant::WriteConstants(
                                      NAME         => 'Cryptoki',

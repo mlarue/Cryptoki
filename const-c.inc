@@ -164,6 +164,61 @@ constant_9 (pTHX_ const char *name, IV *iv_return) {
 }
 
 static int
+constant_10 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     CKA_UNWRAP CKA_VERIFY CKM_SHA256 CKM_SHA512 */
+  /* Offset 8 gives the best switch position.  */
+  switch (name[8]) {
+  case '1':
+    if (memEQ(name, "CKM_SHA512", 10)) {
+    /*                       ^        */
+#ifdef CKM_SHA512
+      *iv_return = CKM_SHA512;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '5':
+    if (memEQ(name, "CKM_SHA256", 10)) {
+    /*                       ^        */
+#ifdef CKM_SHA256
+      *iv_return = CKM_SHA256;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'A':
+    if (memEQ(name, "CKA_UNWRAP", 10)) {
+    /*                       ^        */
+#ifdef CKA_UNWRAP
+      *iv_return = CKA_UNWRAP;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'F':
+    if (memEQ(name, "CKA_VERIFY", 10)) {
+    /*                       ^        */
+#ifdef CKA_VERIFY
+      *iv_return = CKA_VERIFY;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
 constant_11 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
@@ -398,23 +453,35 @@ static int
 constant_19 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CKA_PUBLIC_EXPONENT CKR_FUNCTION_FAILED CKS_RW_SO_FUNCTIONS */
-  /* Offset 16 gives the best switch position.  */
-  switch (name[16]) {
-  case 'E':
-    if (memEQ(name, "CKA_PUBLIC_EXPONENT", 19)) {
-    /*                               ^         */
-#ifdef CKA_PUBLIC_EXPONENT
-      *iv_return = CKA_PUBLIC_EXPONENT;
+     CKA_PUBLIC_EXPONENT CKM_SHA256_RSA_PKCS CKM_SHA512_RSA_PKCS
+     CKR_FUNCTION_FAILED CKS_RW_SO_FUNCTIONS */
+  /* Offset 7 gives the best switch position.  */
+  switch (name[7]) {
+  case '2':
+    if (memEQ(name, "CKM_SHA256_RSA_PKCS", 19)) {
+    /*                      ^                  */
+#ifdef CKM_SHA256_RSA_PKCS
+      *iv_return = CKM_SHA256_RSA_PKCS;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'L':
+  case '5':
+    if (memEQ(name, "CKM_SHA512_RSA_PKCS", 19)) {
+    /*                      ^                  */
+#ifdef CKM_SHA512_RSA_PKCS
+      *iv_return = CKM_SHA512_RSA_PKCS;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'C':
     if (memEQ(name, "CKR_FUNCTION_FAILED", 19)) {
-    /*                               ^         */
+    /*                      ^                  */
 #ifdef CKR_FUNCTION_FAILED
       *iv_return = CKR_FUNCTION_FAILED;
       return PERL_constant_ISIV;
@@ -423,9 +490,20 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'O':
+  case 'L':
+    if (memEQ(name, "CKA_PUBLIC_EXPONENT", 19)) {
+    /*                      ^                  */
+#ifdef CKA_PUBLIC_EXPONENT
+      *iv_return = CKA_PUBLIC_EXPONENT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'S':
     if (memEQ(name, "CKS_RW_SO_FUNCTIONS", 19)) {
-    /*                               ^         */
+    /*                      ^                  */
 #ifdef CKS_RW_SO_FUNCTIONS
       *iv_return = CKS_RW_SO_FUNCTIONS;
       return PERL_constant_ISIV;
@@ -601,7 +679,8 @@ my @names = (qw(CKA_CLASS CKA_DECRYPT CKA_ENCRYPT CKA_ID CKA_KEY_TYPE CKA_LABEL
 	       CKA_MODULUS_BITS CKA_PRIVATE CKA_PUBLIC_EXPONENT CKA_SENSITIVE
 	       CKA_SIGN CKA_TOKEN CKA_UNWRAP CKA_VERIFY CKA_WRAP CKF_RW_SESSION
 	       CKF_SERIAL_SESSION CKK_RSA CKM_RSA_PKCS
-	       CKM_RSA_PKCS_KEY_PAIR_GEN CKO_PRIVATE_KEY CKO_PUBLIC_KEY
+	       CKM_RSA_PKCS_KEY_PAIR_GEN CKM_SHA256 CKM_SHA256_RSA_PKCS
+	       CKM_SHA512 CKM_SHA512_RSA_PKCS CKO_PRIVATE_KEY CKO_PUBLIC_KEY
 	       CKR_ARGUMENTS_BAD CKR_ATTRIBUTE_READ_ONLY
 	       CKR_ATTRIBUTE_TYPE_INVALID CKR_ATTRIBUTE_VALUE_INVALID
 	       CKR_CRYPTOKI_NOT_INITIALIZED CKR_DEVICE_ERROR CKR_DEVICE_MEMORY
@@ -609,14 +688,14 @@ my @names = (qw(CKA_CLASS CKA_DECRYPT CKA_ENCRYPT CKA_ID CKA_KEY_TYPE CKA_LABEL
 	       CKR_FUNCTION_CANCELED CKR_FUNCTION_FAILED CKR_GENERAL_ERROR
 	       CKR_HOST_MEMORY CKR_MECHANISM_INVALID
 	       CKR_MECHANISM_PARAM_INVALID CKR_OK CKR_OPERATION_ACTIVE
-	       CKR_PIN_EXPIRED CKR_PIN_INCORRECT CKR_SESSION_CLOSED
-	       CKR_SESSION_HANDLE_INVALID CKR_SESSION_READ_ONLY
-	       CKR_SESSION_READ_ONLY_EXISTS CKR_TEMPLATE_INCOMPLETE
-	       CKR_TEMPLATE_INCONSISTENT CKR_TOKEN_WRITE_PROTECTED
-	       CKR_USER_NOT_LOGGED_IN CKS_RO_PUBLIC_SESSION
-	       CKS_RO_USER_FUNCTIONS CKS_RW_PUBLIC_SESSION CKS_RW_SO_FUNCTIONS
-	       CKS_RW_USER_FUNCTIONS CKU_SO CKU_USER CK_NEED_ARG_LIST NULL_PTR
-	       TRUE));
+	       CKR_OPERATION_NOT_INITIALIZED CKR_PIN_EXPIRED CKR_PIN_INCORRECT
+	       CKR_SESSION_CLOSED CKR_SESSION_HANDLE_INVALID
+	       CKR_SESSION_READ_ONLY CKR_SESSION_READ_ONLY_EXISTS
+	       CKR_TEMPLATE_INCOMPLETE CKR_TEMPLATE_INCONSISTENT
+	       CKR_TOKEN_WRITE_PROTECTED CKR_USER_NOT_LOGGED_IN
+	       CKS_RO_PUBLIC_SESSION CKS_RO_USER_FUNCTIONS
+	       CKS_RW_PUBLIC_SESSION CKS_RW_SO_FUNCTIONS CKS_RW_USER_FUNCTIONS
+	       CKU_SO CKU_USER CK_NEED_ARG_LIST NULL_PTR TRUE));
 
 print constant_types(), "\n"; # macro defs
 foreach (C_constant ("Cryptoki", 'constant', 'IV', $types, undef, 3, @names) ) {
@@ -658,33 +737,7 @@ __END__
     return constant_9 (aTHX_ name, iv_return);
     break;
   case 10:
-    /* Names all of length 10.  */
-    /* CKA_UNWRAP CKA_VERIFY */
-    /* Offset 4 gives the best switch position.  */
-    switch (name[4]) {
-    case 'U':
-      if (memEQ(name, "CKA_UNWRAP", 10)) {
-      /*                   ^            */
-#ifdef CKA_UNWRAP
-        *iv_return = CKA_UNWRAP;
-        return PERL_constant_ISIV;
-#else
-        return PERL_constant_NOTDEF;
-#endif
-      }
-      break;
-    case 'V':
-      if (memEQ(name, "CKA_VERIFY", 10)) {
-      /*                   ^            */
-#ifdef CKA_VERIFY
-        *iv_return = CKA_VERIFY;
-        return PERL_constant_ISIV;
-#else
-        return PERL_constant_NOTDEF;
-#endif
-      }
-      break;
-    }
+    return constant_10 (aTHX_ name, iv_return);
     break;
   case 11:
     return constant_11 (aTHX_ name, iv_return);
@@ -912,6 +965,16 @@ __END__
 #endif
       }
       break;
+    }
+    break;
+  case 29:
+    if (memEQ(name, "CKR_OPERATION_NOT_INITIALIZED", 29)) {
+#ifdef CKR_OPERATION_NOT_INITIALIZED
+      *iv_return = CKR_OPERATION_NOT_INITIALIZED;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   }

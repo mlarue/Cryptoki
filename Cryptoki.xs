@@ -13,13 +13,11 @@
 
 typedef CK_FUNCTION_LIST*	Cryptoki__FunctionList;
 
-
-CK_FUNCTION_LIST* load( const char *param )
-{
-    CK_FUNCTION_LIST	*fl;
+CK_FUNCTION_LIST* load( const char *param ) {
+    CK_FUNCTION_LIST*	fl;
     CK_RV           	rc;
     CK_RV           	(*C_GetFunctionList)();
-    void           		*d;
+    void*           	d;
 
     d = dlopen(param, RTLD_LAZY | RTLD_LOCAL);
     if ( d == NULL ) {
@@ -47,8 +45,6 @@ CK_FUNCTION_LIST* load( const char *param )
 
 
 
-
-
 XS(boot_Cryptoki__FunctionList); 
 
 MODULE = Cryptoki		PACKAGE = Cryptoki		
@@ -58,10 +54,6 @@ INCLUDE: const-xs.inc
 PROTOTYPES: ENABLE
 
 BOOT:
-	//PUSHMARK(SP); if (items >= 2) { XPUSHs(ST(0)); XPUSHs(ST(1)); } PUTBACK;
-	//boot_Cryptoki__Info(aTHX_ cv);
-	//SPAGAIN; POPs;
-
 	//PUSHMARK(SP); if (items >= 2) { XPUSHs(ST(0)); XPUSHs(ST(1)); } PUTBACK;
 	boot_Cryptoki__FunctionList(aTHX_ cv);
 	//SPAGAIN; POPs;

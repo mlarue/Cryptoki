@@ -301,7 +301,7 @@ L<https://www.oasis-open.org/committees/pkcs11>
 
 =head1 AUTHOR
 
-Markus Lauer, E<lt>mlarue@usermode.deE<gt>
+Markus Lauer, E<lt>mlarue@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -16,23 +16,32 @@ I'm looking forward for version 2.40, which should support TLS 1.2.
 
 To install this module type the following:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+	$ git clone https://lab.usermode.de/Cryptoki
+	$ cd Cryptoki
+	Cryptoki$ perl Makefile.PL
+	Cryptoki$ make
+	Cryptoki$ make test
+	Cryptoki$ make install
 
 =head3 Software HSM
 
 You can test your application with L<SoftHSM|http://www.opendnssec.org/softhsm> from the L<OpenDNSSEC Project|http://www.opendnssec.org>.
 
+Configuration
+
 	$ mkdir ~/.softhsm
 	$ echo "0:/$HOME/.softhsm/slot0.db" >> ~/.softhsm/softhsm.conf
 	$ echo "export SOFTHSM_CONF=~/.softhsm/softhsm.conf" >> ~/.bashrc
+	$ source ~/.bashrc
+
+Initialization
+
 	$ softhsm --init-token --slot 0 --pin 1234 --so-pin 1234 --label testslot
 
 =head2 DOCUMENTATION
 
 See
+
 	$ perldoc Cryptoki
 
 =head2 LINKS

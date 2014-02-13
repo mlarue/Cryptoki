@@ -1,54 +1,58 @@
-=head1 Cryptoki For Perl
+=head1 Cryptoki - Perl extension for PKCS#11
 
-=head2 INTRODUCTION
+=head2 STATUS
 
-In cryptography, PKCS #11 is one of the family of standards called Public-Key Cryptography Standards (PKCS), originally published by RSA Laboratories, that defines a platform-independent API to cryptographic tokens, such as hardware security modules (HSM) and smart cards. (The PKCS #11 standard names the API "Cryptoki" which is an amalgamation of "cryptographic token interface" and is pronounced as "crypto-key", but "PKCS #11" is often used to refer to the API as well as the standard that defines it.)
+This is project is still in a very early development stage.
 
-Since there isn't a real standard for cryptographic tokens, this API has been developed to be an abstraction layer for the generic cryptographic token. The PKCS #11 API defines most commonly used cryptographic object types (RSA keys, X.509 Certificates, DES/Triple DES keys, etc.) and all the functions needed to use, create/generate, modify and delete those objects.
+IT IS NOT READY FOR PRODUCTION!
 
-PKCS #11 is largely adopted to access smart cards and HSMs. Most commercial certificate authority software uses PKCS #11 to access the CA signing key or to enroll user certificates. Cross-platform software that needs to use smart cards uses PKCS #11, such as Mozilla Firefox and OpenSSL (using an extension). Software written for Microsoft Windows may use the platform specific MS-CAPI API instead. 
+"RSA Security Inc. Public-Key Cryptography Standards (PKCS)"
 
-(from L<http://en.wikipedia.org/wiki/PKCS_11>)
+Current stable version: 2.20
 
-=head3 Software HSM
-
-You can test your application with L<SoftHSM|http://www.opendnssec.org/softhsm> from the L<OpenDNSSEC Project|http://www.opendnssec.org>.
+I'm looking forward for version 2.40, which should support TLS 1.2.
 
 =head2 INSTALLATION
 
 To install this module type the following:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+	$ git clone https://lab.usermode.de/Cryptoki
+	$ cd Cryptoki
+	Cryptoki$ perl Makefile.PL
+	Cryptoki$ make
+	Cryptoki$ make test
+	Cryptoki$ make install
 
-=head2 SYNOPSIS
+=head3 Software HSM
 
-	use Cryptoki qw(:all);
+You can test your application with L<SoftHSM|http://www.opendnssec.org/softhsm> from the L<OpenDNSSEC Project|http://www.opendnssec.org>.
 
-	my $f = Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');
+Configuration
 
-	$f->C_Initialize;
+	$ mkdir ~/.softhsm
+	$ echo "0:/$HOME/.softhsm/slot0.db" >> ~/.softhsm/softhsm.conf
+	$ echo "export SOFTHSM_CONF=~/.softhsm/softhsm.conf" >> ~/.bashrc
+	$ source ~/.bashrc
 
-	my $info = {};
-	$f->C_GetInfo($info);
+Initialization
 
-	my $slots = [];
-	$f->C_GetSlotList(1,$slots);
+	$ softhsm --init-token --slot 0 --pin 1234 --so-pin 1234 --label testslot
 
-	for my $id ( @$slots ) {
-		my $slotInfo = {};
-		$f->C_GetSlotInfo($id,$slotInfo);
+=head2 DOCUMENTATION
 
-		my $tokenInfo = {};
-		$f->C_GetTokenInfo($id,$tokenInfo);
-	}
+See
 
-	my $session = -1;
-	$f->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,$session);
+	$ perldoc Cryptoki
 
-	$f->C_Login($session, CKU_USER, '1234'));
+=head2 LINKS
+
+PKCS#11 RSA L<http://www.emc.com/emc-plus/rsa-labs/standards-initiatives/pkcs-11-cryptographic-token-interface-standard.htm>
+
+Stable Version 2.20 L<ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-11/v2-20/pkcs-11v2-20.pdf>
+
+PKCS#11 oasis L<https://www.oasis-open.org/committees/pkcs11>
+
+Public Review Draft 01, 2.40 L<http://docs.oasis-open.org/pkcs11/pkcs11-curr/v2.40/pkcs11-curr-v2.40.pdf>
 
 =head2 COPYRIGHT AND LICENCE
 

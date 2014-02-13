@@ -15,5 +15,6 @@ Makefile.PL
 MANIFEST
 ppport.h
 README.pod
-t/GetFunctionList.t
+t/cryptoki.t
+t/softhsm.t
 typemap

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More skip_all => 'softhsm needed';
 BEGIN { use_ok('Cryptoki', qw/:all/) };
 
 my $f = Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');

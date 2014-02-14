@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
-BEGIN { use_ok('Crypt::Cryptoki', qw/:all/) };
+BEGIN { use_ok('Crypt::Cryptoki::Raw', qw/:all/) };
 
-my $f = Crypt::Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');
+my $f = Crypt::Cryptoki::Raw::load('/usr/lib64/softhsm/libsofthsm.so');
 ok $f, 'load';
 
 is $f->C_Initialize, CKR_OK, 'C_Initialize';

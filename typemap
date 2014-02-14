@@ -4,7 +4,7 @@ TYPEMAP
 	CK_FUNCTION_LIST*		T_PTROBJ
 	CK_INFO					T_PTROBJ
 	CK_INFO*				T_PTROBJ
-	Crypt::Cryptoki::FunctionList 	T_PTROBJ
+	Crypt::Cryptoki::Raw::FunctionList 	T_PTROBJ
 	CK_RV						T_U_LONG
 	CK_BBOOL					T_BOOL
 	CK_SLOT_ID					T_U_LONG

@@ -9,8 +9,8 @@ my $build_class = Module::Build->subclass(
 			my $self = shift;
 			require ExtUtils::ParseXS;
 			ExtUtils::ParseXS::process_file(
-				filename => 'src/Crypt-Cryptoki-FunctionList.xs',
-				output   => 'src/Crypt-Cryptoki-FunctionList.c'
+				filename => 'src/Crypt-Cryptoki-Raw-FunctionList.xs',
+				output   => 'src/Crypt-Cryptoki-Raw-FunctionList.c'
 			);
 			$self->SUPER::ACTION_code(@_);
 		}
@@ -33,12 +33,12 @@ my $build = Crypt::Cryptoki::Build->new(
 	},
 	extra_compiler_flags => ['-Wall'],
 	include_dirs => ['include'],
-	autosplit => 'lib/Crypt/Cryptoki.pm',
+	autosplit => 'lib/Crypt/Cryptoki/Raw.pm',
 	xs_files => {
-		'src/Crypt-Cryptoki.xs' => 'lib/Crypt/Cryptoki.xs'
+		'src/Crypt-Cryptoki-Raw.xs' => 'lib/Crypt/Cryptoki/Raw.xs'
 	},
 	c_source => ['src'],
-	test_files => [ 't/cryptoki.t' ],
+	test_files => [ 't/cryptoki.t', 't/cryptoki-raw.t' ],
 );
 
   my @names = (qw(

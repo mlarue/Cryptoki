@@ -7,12 +7,14 @@ include/cryptoki/pkcs11f.h
 include/cryptoki/pkcs11t.h
 include/ppport.h
 lib/Crypt/Cryptoki.pm
+lib/Crypt/Cryptoki/Raw.pm
 MANIFEST			This list of files
 META.json
 META.yml
 README.pod
-src/Crypt-Cryptoki-FunctionList.xs
-src/Crypt-Cryptoki.xs
+src/Crypt-Cryptoki-Raw-FunctionList.xs
+src/Crypt-Cryptoki-Raw.xs
+t/cryptoki-raw.t
 t/cryptoki.t
 t/softhsm.t
 typemap

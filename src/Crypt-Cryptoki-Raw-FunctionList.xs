@@ -9,9 +9,9 @@
 
 #include "const-c.inc"
 
-typedef CK_FUNCTION_LIST*        Crypt__Cryptoki__FunctionList;
+typedef CK_FUNCTION_LIST*        Crypt__Cryptoki__Raw__FunctionList;
 
-MODULE = Crypt::Cryptoki::FunctionList		PACKAGE = Crypt::Cryptoki::FunctionList
+MODULE = Crypt::Cryptoki::Raw::FunctionList		PACKAGE = Crypt::Cryptoki::Raw::FunctionList
 
 INCLUDE: const-xs.inc
 
@@ -19,7 +19,7 @@ PROTOTYPES: ENABLE
 
 CK_RV
 C_Initialize(fl)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 CODE:
 	RETVAL = fl->C_Initialize(NULL);
 OUTPUT:
@@ -28,7 +28,7 @@ OUTPUT:
 
 CK_RV
 C_GetInfo(fl,info)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	HV*						info
 CODE:
 	CK_INFO _info;
@@ -49,7 +49,7 @@ OUTPUT:
 
 CK_RV
 C_GetSlotList(fl,tokenPresent,pSlotList)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_BBOOL 				tokenPresent
 	AV*			 			pSlotList
 CODE:
@@ -79,7 +79,7 @@ OUTPUT:
 
 CK_RV
 C_GetSlotInfo(fl,slotID,pInfo)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SLOT_ID				slotID
 	HV*						pInfo
 CODE:
@@ -102,7 +102,7 @@ OUTPUT:
 
 CK_RV
 C_GetTokenInfo(fl,slotID,pInfo)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SLOT_ID				slotID
 	HV*						pInfo
 CODE:
@@ -137,7 +137,7 @@ OUTPUT:
 
 CK_RV
 C_OpenSession(fl,slotID,flags,phSession)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SLOT_ID 			slotID
 	CK_FLAGS 			flags
 //	CK_VOID_PTR 			pApplication 
@@ -152,7 +152,7 @@ OUTPUT:
 
 CK_RV
 C_GetSessionInfo(fl,hSession,pInfo)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	HV* 					pInfo
 CODE:
@@ -172,7 +172,7 @@ OUTPUT:
 
 CK_RV
 C_Login(fl,hSession,userType,pPin)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	CK_USER_TYPE 			userType
 	CK_UTF8CHAR_PTR	 		pPin
@@ -188,7 +188,7 @@ C_GenerateKeyPair(fl,hSession,pMechanism, \
 	pPublicKeyTemplate, \
 	pPrivateKeyTemplate, \
 	phPublicKey,phPrivateKey)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	AV*				 		pMechanism
 	AV* 					pPublicKeyTemplate
@@ -261,7 +261,7 @@ OUTPUT:
 
 CK_RV
 C_EncryptInit(fl,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	AV*				 		pMechanism
 	CK_OBJECT_HANDLE 		hKey
@@ -279,7 +279,7 @@ OUTPUT:
 
 CK_RV
 C_Encrypt(fl,hSession,pData,ulDataLen,pEncryptedData,ulEncryptedDataLen)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	char* 					pData
 	CK_ULONG				ulDataLen
@@ -307,7 +307,7 @@ OUTPUT:
 
 CK_RV
 C_DecryptInit(fl,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	AV*				 		pMechanism
 	CK_OBJECT_HANDLE 		hKey
@@ -324,7 +324,7 @@ OUTPUT:
 
 CK_RV
 C_Decrypt(fl,hSession,pEncryptedData,ulEncryptedDataLen,pData,ulDataLen)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	char* 					pEncryptedData
 	CK_ULONG				ulEncryptedDataLen
@@ -352,7 +352,7 @@ OUTPUT:
 
 CK_RV
 C_SignInit(fl,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	AV*				 		pMechanism
 	CK_OBJECT_HANDLE 		hKey
@@ -369,7 +369,7 @@ OUTPUT:
 
 CK_RV
 C_Sign(fl,hSession,pData,ulDataLen,pSignature,ulSignatureLen)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	char* 					pData
 	CK_ULONG				ulDataLen
@@ -397,7 +397,7 @@ OUTPUT:
 
 CK_RV
 C_VerifyInit(fl,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	AV*				 		pMechanism
 	CK_OBJECT_HANDLE 		hKey
@@ -414,7 +414,7 @@ OUTPUT:
 
 CK_RV
 C_Verify(fl,hSession,pData,ulDataLen,pSignature,ulSignatureLen)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	char* 					pData
 	CK_ULONG				ulDataLen
@@ -431,7 +431,7 @@ OUTPUT:
 
 CK_RV
 C_DestroyObject(fl,hSession,hObject)
-	Crypt::Cryptoki::FunctionList	fl
+	Crypt::Cryptoki::Raw::FunctionList	fl
 	CK_SESSION_HANDLE 		hSession
 	CK_OBJECT_HANDLE 		hObject
 CODE:

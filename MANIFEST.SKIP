@@ -3,3 +3,11 @@
 \.bak$
 ~$
 ^src/Crypt-Cryptoki-FunctionList.c
+^MYMETA\.yml$
+^MYMETA\.json$
+^Build$
+^_build/
+^blib/
+^lib/.*\.(c|xs|o)$
+^src/.*\.(c|o|inc)$
+\.tar\.gz$

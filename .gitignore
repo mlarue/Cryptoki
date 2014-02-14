@@ -7,7 +7,6 @@ Build
 _build
 *.bak
 MYMETA.*
-META.*
 lib/Crypt/Cryptoki.c
 src/Crypt-Cryptoki-FunctionList.c
 blib

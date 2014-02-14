@@ -6,6 +6,49 @@ use warnings;
 
 our $VERSION = '0.01_07';
 
+use Carp;
+use Moo;
+
+use Crypt::Cryptoki::Raw qw(rv_to_str CKR_OK);
+use Crypt::Cryptoki::Slot;
+use Crypt::Cryptoki::SlotWithToken;
+
+has 'module' => ( is => 'ro', required => 1 );
+has '_fl' => ( is => 'lazy' );
+
+sub _build__fl {
+	my $self = shift;
+	my $fl = Crypt::Cryptoki::Raw::load($self->module);
+	my $rv = $fl->C_Initialize;
+	if ( $rv != CKR_OK ) {
+		croak rv_to_str($rv);
+	}
+	return $fl;
+}
+
+sub info {
+	my $self = shift;
+	my $info = {};
+	my $rv = $self->_fl->C_GetInfo($info);
+	if ( $rv != CKR_OK ) {
+		croak rv_to_str($rv);
+	}
+	return $info;
+}
+
+sub slots {
+	my ( $self, %args ) = @_;
+	$args{token} ||= 0;
+	my $slots = [];
+	my $rv = $self->_fl->C_GetSlotList($args{token},$slots);
+	if ( $rv != CKR_OK ) {
+		croak rv_to_str($rv);
+	}
+	return $args{token} ?
+		map { Crypt::Cryptoki::SlotWithToken->new(ctx=>$self,id=>$_) } @$slots :
+		map { Crypt::Cryptoki::Slot->new(ctx=>$self,id=>$_) } @$slots;
+}
+
 1;
 __END__
 =head1 NAME
@@ -14,150 +57,53 @@ Crypt::Cryptoki - Perl extension for PKCS#11
 
 =head1 SYNOPSIS
 
-	use Crypt::Cryptoki qw(:all);
+	use Crypt::Cryptoki;
 
-	my $f = Crypt::Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');
+	my $c = Crypt::Cryptoki->new('/usr/lib64/softhsm/libsofthsm.so');
 
-	$f->C_Initialize;
+	my $info = $c->info;
 
-	my $info = {};
-	$f->C_GetInfo($info);
-
-	my $slots = [];
-	$f->C_GetSlotList(1,$slots);
-
-	for my $id ( @$slots ) {
-		my $slotInfo = {};
-		$f->C_GetSlotInfo($id,$slotInfo);
-
-		my $tokenInfo = {};
-		$f->C_GetTokenInfo($id,$tokenInfo);
+	for my $slot ( @{ $c->slots(1) } ) {
+		$slot->info;
+		$slot->token_info;
 	}
 
-	my $session = -1;
-	$f->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,$session);
+	my $session = $c->open_session(
+		slot => $slot,
+		serial => 1,
+		rw => 1
+	);
 
-	$f->C_Login($session, CKU_USER, '1234'));
+	$session->login_user('1234');
 
-	
-	(see also: t/softhsm.t)
+	# or
+	$session->login_so('1234');
 
 
 =head1 DESCRIPTION
 
-This module brings the "Cryptoki" to perl. It is nearly a one-to-one mapping
-from C to Perl and vice versa.
+This module uses "Crypt::Cryptoki::Raw" to provide a object-oriented access to PKCS#11 instances.
 
 "RSA Security Inc. Public-Key Cryptography Standards (PKCS)"
+Please refer to Crypt::Cryptoki::Raw for more information about PKCS#11.
 
-Original documentation: L<ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-11/v2-20/pkcs-11v2-20.pdf>
 
-C header files and documentation are also part of the distribution.
 
 =head2 FUNCTIONS
 
-	C_Initialize
-	C_GetInfo
-	C_GetSlotList
-	C_GetSlotInfo
-	C_GetTokenInfo
-	C_OpenSession
-	C_GetSessionInfo
-	C_Login
-	C_GenerateKeyPair
-	C_EncryptInit
-	C_Encrypt
-	C_DecryptInit
-	C_Decrypt
-	C_SignInit
-	C_Sign
-	C_VerifyInit
-	C_Verify
-	C_DestroyObject
+	new
+
+=head2 METHODS
+
+	info
+	slots
+	open_session
 
 =head2 EXPORT
 
 None by default.
 
-=head2 Exportable constants
-
-	CK_NEED_ARG_LIST 
-
-	TRUE
-	NULL_PTR
-
-	CKR_OK 
-	CKR_PIN_INCORRECT
-	CKR_ARGUMENTS_BAD
-	CKR_ATTRIBUTE_READ_ONLY
-	CKR_ATTRIBUTE_TYPE_INVALID
-	CKR_ATTRIBUTE_VALUE_INVALID
-	CKR_CRYPTOKI_NOT_INITIALIZED
-	CKR_DEVICE_ERROR
-	CKR_DEVICE_MEMORY
-	CKR_DEVICE_REMOVED
-	CKR_DOMAIN_PARAMS_INVALID
-	CKR_FUNCTION_CANCELED
-	CKR_FUNCTION_FAILED
-	CKR_GENERAL_ERROR
-	CKR_HOST_MEMORY
-	CKR_MECHANISM_INVALID
-	CKR_MECHANISM_PARAM_INVALID
-	CKR_OPERATION_ACTIVE
-	CKR_OPERATION_NOT_INITIALIZED
-	CKR_PIN_EXPIRED
-	CKR_SESSION_CLOSED
-	CKR_SESSION_HANDLE_INVALID
-	CKR_SESSION_READ_ONLY
-	CKR_SESSION_READ_ONLY_EXISTS
-	CKR_TEMPLATE_INCOMPLETE
-	CKR_TEMPLATE_INCONSISTENT
-	CKR_TOKEN_WRITE_PROTECTED
-	CKR_USER_NOT_LOGGED_IN
-
-	CKF_SERIAL_SESSION 
-	CKF_RW_SESSION
-
-	CKU_USER 
-	CKU_SO
-
-	CKO_PRIVATE_KEY
-	CKO_PUBLIC_KEY
-
-	CKK_RSA
-
-	CKS_RO_PUBLIC_SESSION
-	CKS_RO_USER_FUNCTIONS
-	CKS_RW_PUBLIC_SESSION
-	CKS_RW_USER_FUNCTIONS
-	CKS_RW_SO_FUNCTIONS
-
-	CKA_CLASS
-	CKA_KEY_TYPE 
-	CKA_TOKEN
-	CKA_PRIVATE
-	CKA_SENSITIVE
-	CKA_DECRYPT
-	CKA_SIGN
-	CKA_UNWRAP
-	CKA_ENCRYPT
-	CKA_VERIFY
-	CKA_WRAP
-	CKA_MODULUS_BITS
-	CKA_PUBLIC_EXPONENT
-	CKA_LABEL
-	CKA_ID
-
-	CKM_RSA_PKCS_KEY_PAIR_GEN
-	CKM_RSA_PKCS
-	CKM_SHA256_RSA_PKCS
-	CKM_SHA512_RSA_PKCS
-	CKM_SHA256
-	CKM_SHA512
-
 =head2 TODO
-
-Everything to cover Cryptoki 2.20. Especially the incremental functions.
 
 =head1 SEE ALSO
 

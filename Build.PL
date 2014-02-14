@@ -38,7 +38,8 @@ my $build = Crypt::Cryptoki::Build->new(
 		'src/Crypt-Cryptoki-Raw.xs' => 'lib/Crypt/Cryptoki/Raw.xs'
 	},
 	c_source => ['src'],
-	test_files => [ 't/cryptoki.t', 't/cryptoki-raw.t' ],
+	recursive_test_files => 1,
+	test_files => 't/auto',
 );
 
   my @names = (qw(

@@ -1,4 +1,4 @@
-=head1 Cryptoki - Perl extension for PKCS#11
+=head1 Crypt::Cryptoki - Perl extension for PKCS#11
 
 =head2 STATUS
 
@@ -16,12 +16,12 @@ I'm looking forward for version 2.40, which should support TLS 1.2.
 
 To install this module type the following:
 
-	$ git clone https://github.com/mlarue/Cryptoki.git
-	$ cd Cryptoki
-	Cryptoki$ perl Makefile.PL
-	Cryptoki$ make
-	Cryptoki$ make test
-	Cryptoki$ make install
+	$ git clone https://github.com/mlarue/p5-Crypt-Cryptoki.git
+	$ cd p5-Crypt-Cryptoki
+	p5-Crypt-Cryptoki$ perl Makefile.PL
+	p5-Crypt-Cryptoki$ make
+	p5-Crypt-Cryptoki$ make test
+	p5-Crypt-Cryptoki$ make install
 
 =head3 Software HSM
 
@@ -42,7 +42,7 @@ Initialization
 
 See
 
-	$ perldoc Cryptoki
+	$ perldoc Crypt::Cryptoki
 
 =head2 LINKS
 

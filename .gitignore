@@ -1,3 +1,9 @@
 *~
 *.old
 .project
+*.o
+lib/Crypt/Cryptoki.xs
+Build
+_build
+*.bak
+MYMETA.*

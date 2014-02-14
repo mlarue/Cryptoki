@@ -1,4 +1,4 @@
-package Cryptoki;
+package Crypt::Cryptoki;
 
 use 5.018002;
 use strict;
@@ -10,13 +10,6 @@ use AutoLoader;
 
 our @ISA = qw(Exporter);
 
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Cryptoki ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	rv_to_str
 
@@ -106,7 +99,7 @@ sub AUTOLOAD {
     my $constname;
     our $AUTOLOAD;
     ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&Cryptoki::constant not defined" if $constname eq 'constant';
+    croak "&Crypt::Cryptoki::constant not defined" if $constname eq 'constant';
     my ($error, $val) = constant($constname);
     if ($error) { croak $error; }
     {
@@ -123,7 +116,7 @@ sub AUTOLOAD {
 }
 
 require XSLoader;
-XSLoader::load('Cryptoki', $VERSION);
+XSLoader::load('Crypt::Cryptoki', $VERSION);
 
 # Preloaded methods go here.
 
@@ -144,13 +137,13 @@ sub rv_to_str {
 __END__
 =head1 NAME
 
-Cryptoki - Perl extension for PKCS#11
+Crypt::Cryptoki - Perl extension for PKCS#11
 
 =head1 SYNOPSIS
 
-	use Cryptoki qw(:all);
+	use Crypt::Cryptoki qw(:all);
 
-	my $f = Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');
+	my $f = Crypt::Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');
 
 	$f->C_Initialize;
 
@@ -174,7 +167,7 @@ Cryptoki - Perl extension for PKCS#11
 	$f->C_Login($session, CKU_USER, '1234'));
 
 	
-	(see also: t/GetFunctionList.t)
+	(see also: t/softhsm.t)
 
 
 =head1 DESCRIPTION

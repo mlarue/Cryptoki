@@ -9,9 +9,9 @@
 
 #include "cryptoki/cryptoki.h"
 
-#include "const-c.inc"
+#include "../../src/const-c.inc"
 
-typedef CK_FUNCTION_LIST*	Cryptoki__FunctionList;
+typedef CK_FUNCTION_LIST*	Crypt__Cryptoki__FunctionList;
 
 CK_FUNCTION_LIST* load( const char *param ) {
     CK_FUNCTION_LIST*	fl;
@@ -45,21 +45,21 @@ CK_FUNCTION_LIST* load( const char *param ) {
 
 
 
-XS(boot_Cryptoki__FunctionList); 
+XS(boot_Crypt__Cryptoki__FunctionList); 
 
-MODULE = Cryptoki		PACKAGE = Cryptoki		
+MODULE = Crypt::Cryptoki		PACKAGE = Crypt::Cryptoki		
 
-INCLUDE: const-xs.inc
+INCLUDE: ../../src/const-xs.inc
 
 PROTOTYPES: ENABLE
 
 BOOT:
 	//PUSHMARK(SP); if (items >= 2) { XPUSHs(ST(0)); XPUSHs(ST(1)); } PUTBACK;
-	boot_Cryptoki__FunctionList(aTHX_ cv);
+	boot_Crypt__Cryptoki__FunctionList(aTHX_ cv);
 	//SPAGAIN; POPs;
 
 
-Cryptoki::FunctionList
+Crypt::Cryptoki::FunctionList
 load(param)
 	const char *		param
 

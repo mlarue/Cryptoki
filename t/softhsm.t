@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use Test::More skip_all => 'softhsm needed';
-BEGIN { use_ok('Cryptoki', qw/:all/) };
+use Test::More;
+BEGIN { use_ok('Crypt::Cryptoki', qw/:all/) };
 
-my $f = Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');
+my $f = Crypt::Cryptoki::load('/usr/lib64/softhsm/libsofthsm.so');
 ok $f, 'load';
 
 is $f->C_Initialize, CKR_OK, 'C_Initialize';

@@ -698,11 +698,11 @@ my @names = (qw(CKA_CLASS CKA_DECRYPT CKA_ENCRYPT CKA_ID CKA_KEY_TYPE CKA_LABEL
 	       CKU_SO CKU_USER CK_NEED_ARG_LIST NULL_PTR TRUE));
 
 print constant_types(), "\n"; # macro defs
-foreach (C_constant ("Cryptoki", 'constant', 'IV', $types, undef, 3, @names) ) {
+foreach (C_constant ("Crypt::Cryptoki", 'constant', 'IV', $types, undef, 3, @names) ) {
     print $_, "\n"; # C constant subs
 }
 print "\n#### XS Section:\n";
-print XS_constant ("Cryptoki", $types);
+print XS_constant ("Crypt::Cryptoki", $types);
 __END__
    */
 

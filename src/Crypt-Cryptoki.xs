@@ -54,9 +54,9 @@ INCLUDE: ../../src/const-xs.inc
 PROTOTYPES: ENABLE
 
 BOOT:
-	//PUSHMARK(SP); if (items >= 2) { XPUSHs(ST(0)); XPUSHs(ST(1)); } PUTBACK;
+	/*PUSHMARK(SP); if (items >= 2) { XPUSHs(ST(0)); XPUSHs(ST(1)); } PUTBACK; */
 	boot_Crypt__Cryptoki__FunctionList(aTHX_ cv);
-	//SPAGAIN; POPs;
+	/*SPAGAIN; POPs; */
 
 
 Crypt::Cryptoki::FunctionList

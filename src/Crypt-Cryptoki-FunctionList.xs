@@ -138,10 +138,10 @@ OUTPUT:
 CK_RV
 C_OpenSession(fl,slotID,flags,phSession)
 	Crypt::Cryptoki::FunctionList	fl
-	CK_SLOT_ID 				slotID
-	CK_FLAGS 				flags
-//	CK_VOID_PTR 			pApplication
-//	CK_NOTIFY 				Notify
+	CK_SLOT_ID 			slotID
+	CK_FLAGS 			flags
+//	CK_VOID_PTR 			pApplication 
+//	CK_NOTIFY 			Notify
 	CK_SESSION_HANDLE	 	phSession
 CODE:
 	RETVAL = fl->C_OpenSession(slotID,flags,NULL_PTR,NULL_PTR,&phSession);
@@ -206,9 +206,9 @@ CODE:
 	_pMechanism.pParameter = NULL_PTR;
 	_pMechanism.ulParameterLen = 0; 
 
-	Newxz(_pPublicKeyTemplate, av_top_index(pPublicKeyTemplate)+1, CK_ATTRIBUTE);
+	Newxz(_pPublicKeyTemplate, av_len(pPublicKeyTemplate)+1, CK_ATTRIBUTE);
 	int i = 0;
-	for(i=0;i<=av_top_index(pPublicKeyTemplate);++i){
+	for(i=0;i<=av_len(pPublicKeyTemplate);++i){
 		SV** elem = av_fetch(pPublicKeyTemplate, i, 0);
 		if ( elem != NULL ) {
 			AV* attr = (AV*)SvRV(*elem);
@@ -227,8 +227,8 @@ CODE:
 		}
 	}
 
-	Newxz(_pPrivateKeyTemplate, av_top_index(pPrivateKeyTemplate)+1, CK_ATTRIBUTE);
-	for(i=0;i<=av_top_index(pPrivateKeyTemplate);++i){
+	Newxz(_pPrivateKeyTemplate, av_len(pPrivateKeyTemplate)+1, CK_ATTRIBUTE);
+	for(i=0;i<=av_len(pPrivateKeyTemplate);++i){
 		SV** elem = av_fetch(pPrivateKeyTemplate, i, 0);
 		if ( elem != NULL ) {
 			AV* attr = (AV*)SvRV(*elem);

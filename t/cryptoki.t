@@ -39,8 +39,6 @@ my $t_public = Crypt::Cryptoki::Template->new(
 	id => pack('C*', 0x01, 0x02, 0x03)
 );
 
-diag explain $t_public->template;
-
 my $t_private = Crypt::Cryptoki::Template->new(
 	class => 'private_key',
 	key_type => 'rsa',
@@ -52,8 +50,15 @@ my $t_private = Crypt::Cryptoki::Template->new(
 	id => pack('C*', 0x01, 0x02, 0x03)
 );
 
-diag explain $t_private->template;
-
 my ( $public_key, $private_key ) = $session->generate_key_pair($t_public,$t_private);
+
+my $plain_text = 'plain text';
+my ( $encrypted_text_ref, $len ) = $public_key->encrypt(\$plain_text, length($plain_text));
+
+my ( $encrypted_text_ref ) = $private_key->decrypt($encrypted_text_ref, $len);
+diag $$encrypted_text_ref;
+
+$public_key->destroy;
+$private_key->destroy;
 
 done_testing();

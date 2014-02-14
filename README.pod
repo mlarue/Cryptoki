@@ -18,10 +18,10 @@ To install this module type the following:
 
 	$ git clone https://github.com/mlarue/p5-Crypt-Cryptoki.git
 	$ cd p5-Crypt-Cryptoki
-	p5-Crypt-Cryptoki$ perl Makefile.PL
-	p5-Crypt-Cryptoki$ make
-	p5-Crypt-Cryptoki$ make test
-	p5-Crypt-Cryptoki$ make install
+	p5-Crypt-Cryptoki$ perl Build.PL
+	p5-Crypt-Cryptoki$ ./Build
+	p5-Crypt-Cryptoki$ ./Build test
+	p5-Crypt-Cryptoki$ ./Build install
 
 =head3 Software HSM
 

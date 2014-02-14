@@ -7,7 +7,6 @@ include/cryptoki/pkcs11f.h
 include/cryptoki/pkcs11t.h
 include/ppport.h
 lib/Crypt/Cryptoki.pm
-Makefile.PL
 MANIFEST			This list of files
 README.pod
 src/const-c.inc

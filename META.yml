@@ -3,22 +3,24 @@ abstract: 'Perl extension for PKCS#11'
 author:
   - 'Markus Lauer, E<lt>mlarue@cpan.orgE<gt>'
 build_requires:
-  ExtUtils::CBuilder: 0
-  ExtUtils::Constant: 0
-  ExtUtils::ParseXS: 0
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Constant: '0'
+  ExtUtils::ParseXS: '0'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.133380'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Crypt-Cryptoki
 provides:
   Crypt::Cryptoki:
     file: lib/Crypt/Cryptoki.pm
-    version: 0.01_06
+    version: 0.01_07
+requires:
+  perl: v5.12.5
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01_06
+version: 0.01_07

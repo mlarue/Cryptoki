@@ -4,7 +4,7 @@
       "Markus Lauer, E<lt>mlarue@cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "generated_by" : "Module::Build version 0.4205",
    "license" : [
       "perl_5"
    ],
@@ -25,12 +25,17 @@
          "requires" : {
             "Module::Build" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.12.5"
+         }
       }
    },
    "provides" : {
       "Crypt::Cryptoki" : {
          "file" : "lib/Crypt/Cryptoki.pm",
-         "version" : "0.01_06"
+         "version" : "0.01_07"
       }
    },
    "release_status" : "testing",
@@ -39,5 +44,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01_06"
+   "version" : "0.01_07"
 }

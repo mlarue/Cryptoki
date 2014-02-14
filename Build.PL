@@ -20,6 +20,9 @@ my $build_class = Module::Build->subclass(
 my $build = Crypt::Cryptoki::Build->new(
 	module_name => 'Crypt::Cryptoki',
 	license => 'perl',
+	requires => {
+                'perl' => '5.12.5',
+	},
 	configure_requires => { 
 		'Module::Build' => 0 
 	},

@@ -16,3 +16,5 @@ src/Crypt-Cryptoki.xs
 t/cryptoki.t
 t/softhsm.t
 typemap
+META.yml
+META.json

@@ -30,7 +30,7 @@ You can test your application with L<SoftHSM|http://www.opendnssec.org/softhsm> 
 Configuration
 
 	$ mkdir ~/.softhsm
-	$ echo "0:/$HOME/.softhsm/slot0.db" >> ~/.softhsm/softhsm.conf
+	$ echo "0:$HOME/.softhsm/slot0.db" >> ~/.softhsm/softhsm.conf
 	$ echo "export SOFTHSM_CONF=~/.softhsm/softhsm.conf" >> ~/.bashrc
 	$ source ~/.bashrc
 

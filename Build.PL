@@ -35,6 +35,7 @@ my $build = Crypt::Cryptoki::Build->new(
 		'src/Crypt-Cryptoki.xs' => 'lib/Crypt/Cryptoki.xs'
 	},
 	c_source => ['src'],
+	test_files => [ 't/cryptoki.t' ],
 );
 
   my @names = (qw(

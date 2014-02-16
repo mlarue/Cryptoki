@@ -105,6 +105,7 @@ my $build = Crypt::Cryptoki::Build->new(
     CKA_ENCRYPT
     CKA_VERIFY
     CKA_WRAP
+    CKA_MODULUS
     CKA_MODULUS_BITS
     CKA_PUBLIC_EXPONENT
 	CKA_LABEL

@@ -29,7 +29,7 @@ sub export_as_string {
 sub encrypt {
 	my ( $self, $plain_text_ref, $plain_text_len ) = @_;
 
-	my $rv = $self->session->slot->ctx->_fl->C_EncryptInit(
+	my $rv = $self->_fl->C_EncryptInit(
 		$self->session->id, 
 		[ CKM_RSA_PKCS, NULL_PTR, 0 ], 
 		$self->id
@@ -41,7 +41,7 @@ sub encrypt {
 	my $encrypted_text = '';
 	my $encrypted_text_len = -1;
 
-	$rv = $self->session->slot->ctx->_fl->C_Encrypt(
+	$rv = $self->_fl->C_Encrypt(
 		$self->session->id, 
 		$$plain_text_ref,
 		$plain_text_len,

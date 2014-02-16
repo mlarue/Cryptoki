@@ -57,7 +57,7 @@ try {
 	my $plain_text = 'plain text';
 	my ( $encrypted_text_ref, $len ) = $public_key->encrypt(\$plain_text, length($plain_text));
 
-	my ( $encrypted_text_ref ) = $private_key->decrypt($encrypted_text_ref, $len);
+	( $encrypted_text_ref ) = $private_key->decrypt($encrypted_text_ref, $len);
 	diag $$encrypted_text_ref;
 
 	diag explain $public_key->hex_attributes;
@@ -68,3 +68,4 @@ ok $public_key->destroy;
 ok $private_key->destroy;
 
 done_testing();
+

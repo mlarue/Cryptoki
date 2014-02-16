@@ -12,6 +12,11 @@ has 'slot' => ( is => 'ro', required => 1 );
 has 'serial' => ( is => 'ro', default => 1 );
 has 'rw' => ( is => 'ro' );
 has 'id' => ( is => 'lazy' );
+has '_fl' => ( is => 'lazy' );
+
+sub _build__fl {
+	shift->slot->ctx->_fl;
+}
 
 sub _build_id {
 	my $self = shift;
@@ -19,45 +24,45 @@ sub _build_id {
 }
 
 sub open {
-        my ( $self ) = @_;
+	my ( $self ) = @_;
 
-        my $flags = 0;
-        $flags |= CKF_SERIAL_SESSION if $self->serial;
-        $flags |= CKF_RW_SESSION if $self->rw;
+	my $flags = 0;
+	$flags |= CKF_SERIAL_SESSION if $self->serial;
+	$flags |= CKF_RW_SESSION if $self->rw;
 
-        my $session = -1;
-        my $rv = $self->slot->ctx->_fl->C_OpenSession($self->slot->id, $flags, $session);
-        if ( $rv != CKR_OK ) {
-                croak rv_to_str($rv);
-        }
+	my $session = -1;
+	my $rv = $self->_fl->C_OpenSession($self->slot->id, $flags, $session);
+	if ( $rv != CKR_OK ) {
+		croak rv_to_str($rv);
+	}
 	return $session;
 }
 
 sub login {
-        my ( $self, $user, $pin ) = @_;
-        my $rv = $self->slot->ctx->_fl->C_Login($self->id, $user, $pin);
-        if ( $rv != CKR_OK ) {
-                croak rv_to_str($rv);
-        }
-        return 1;
+	my ( $self, $user, $pin ) = @_;
+	my $rv = $self->_fl->C_Login($self->id, $user, $pin);
+	if ( $rv != CKR_OK ) {
+		croak rv_to_str($rv);
+	}
+	return 1;
 }
 
 sub login_user {
-        my ( $self, $pin ) = @_;
+	my ( $self, $pin ) = @_;
 	$self->login(CKU_USER,$pin);
 }
  
 sub login_so {
-        my ( $self, $pin ) = @_;
+	my ( $self, $pin ) = @_;
 	# TODO
 	$self->login(CKU_USER,$pin);
 }
  
 sub generate_key_pair {
-        my ( $self, $template_public_key, $template_private_key ) = @_;
+	my ( $self, $template_public_key, $template_private_key ) = @_;
 	my $private_key = -1;
 	my $public_key = -1;
-        my $rv = $self->slot->ctx->_fl->C_GenerateKeyPair(
+	my $rv = $self->_fl->C_GenerateKeyPair(
 		$self->id, 
 		[ CKM_RSA_PKCS_KEY_PAIR_GEN, NULL_PTR, 0 ],
 		$template_public_key->template,
@@ -65,10 +70,10 @@ sub generate_key_pair {
 		$public_key, 
 		$private_key
 	);
-        if ( $rv != CKR_OK ) {
-                croak rv_to_str($rv);
-        }
-        return ( 
+	if ( $rv != CKR_OK ) {
+		croak rv_to_str($rv);
+	}
+	return ( 
 		Crypt::Cryptoki::PublicKey->new(session=>$self,id=>$public_key),
 		Crypt::Cryptoki::PrivateKey->new(session=>$self,id=>$private_key)
 	);

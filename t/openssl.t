@@ -114,8 +114,6 @@ is rv_to_str($f->C_Decrypt(
 
 is $decrypted_text, $plain_text, 'decryption OK';
 
-$rsa_pub->DESTROY;
-
 is $f->C_DestroyObject($session, $public_key), CKR_OK, 'destroy public key';
 is $f->C_DestroyObject($session, $private_key), CKR_OK, 'destroy private key';
 

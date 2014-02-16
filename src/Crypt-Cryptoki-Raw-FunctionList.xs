@@ -470,6 +470,9 @@ CODE:
 			croak("Illegal array length in argument");
 		}
 		_pTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
+		
+		// TODO: special case: pValue is array of attributes
+
 		_pTemplate[i].pValue = NULL;
 		_pTemplate[i].ulValueLen = 0;
 		ulCount++;

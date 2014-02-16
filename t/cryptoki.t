@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Try::Tiny;
 
 use_ok 'Crypt::Cryptoki';
 use_ok 'Crypt::Cryptoki::Template';
@@ -52,13 +53,18 @@ my $t_private = Crypt::Cryptoki::Template->new(
 
 my ( $public_key, $private_key ) = $session->generate_key_pair($t_public,$t_private);
 
-my $plain_text = 'plain text';
-my ( $encrypted_text_ref, $len ) = $public_key->encrypt(\$plain_text, length($plain_text));
+try {
+	my $plain_text = 'plain text';
+	my ( $encrypted_text_ref, $len ) = $public_key->encrypt(\$plain_text, length($plain_text));
 
-my ( $encrypted_text_ref ) = $private_key->decrypt($encrypted_text_ref, $len);
-diag $$encrypted_text_ref;
+	my ( $encrypted_text_ref ) = $private_key->decrypt($encrypted_text_ref, $len);
+	diag $$encrypted_text_ref;
 
-$public_key->destroy;
-$private_key->destroy;
+	diag explain $public_key->hex_attributes;
+	diag $public_key->export_as_string;
+} catch { diag $_; 0 };
+
+ok $public_key->destroy;
+ok $private_key->destroy;
 
 done_testing();

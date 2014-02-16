@@ -160,10 +160,22 @@ is rv_to_str($f->C_Verify(
 )), 'CKR_OK', 'C_Verify';
 
 
+my $get_attributes_template = [
+    [ CKA_MODULUS, '' ],
+    [ CKA_PUBLIC_EXPONENT, '' ],
+];
+
+is rv_to_str($f->C_GetAttributeValue(
+	$session,
+	$public_key,
+	$get_attributes_template
+)), 'CKR_OK', 'C_GetAttributeValue';
+	
+diag 'modulus: ', unpack('H*', $get_attributes_template->[0][1]);
+diag 'exponent: ', unpack('H*', $get_attributes_template->[1][1]);
 
 is $f->C_DestroyObject($session, $public_key), CKR_OK, 'destroy public key';
 is $f->C_DestroyObject($session, $private_key), CKR_OK, 'destroy private key';
-
 
 done_testing();
 

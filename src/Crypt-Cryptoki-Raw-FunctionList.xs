@@ -210,39 +210,45 @@ CODE:
 	int i = 0;
 	for(i=0;i<=av_len(pPublicKeyTemplate);++i){
 		SV** elem = av_fetch(pPublicKeyTemplate, i, 0);
-		if ( elem != NULL ) {
-			AV* attr = (AV*)SvRV(*elem);
-			// TODO: check if attr is AV*
-			// TODO: length check
-
-			_pPublicKeyTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
-
-			SV* _value = *av_fetch(attr, 1, 0);
-			CK_ULONG _len = sv_len(_value);
-
-			_pPublicKeyTemplate[i].pValue = (void*)SvPV(_value, _len);
-			_pPublicKeyTemplate[i].ulValueLen = _len;
-
-			ulPublicKeyAttributeCount++;
+		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
+			croak("Error: wrong argument");
 		}
+		AV* attr = (AV*)SvRV(*elem);
+		if ( av_len(attr) != 1 ) { // 2
+			croak("Illegal array length in argument");
+		}
+
+		_pPublicKeyTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
+
+		SV* _value = *av_fetch(attr, 1, 0);
+		CK_ULONG _len = sv_len(_value);
+
+		_pPublicKeyTemplate[i].pValue = (void*)SvPV(_value, _len);
+		_pPublicKeyTemplate[i].ulValueLen = _len;
+
+		ulPublicKeyAttributeCount++;
 	}
 
 	Newxz(_pPrivateKeyTemplate, av_len(pPrivateKeyTemplate)+1, CK_ATTRIBUTE);
 	for(i=0;i<=av_len(pPrivateKeyTemplate);++i){
 		SV** elem = av_fetch(pPrivateKeyTemplate, i, 0);
-		if ( elem != NULL ) {
-			AV* attr = (AV*)SvRV(*elem);
-
-			_pPrivateKeyTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
-
-			SV* _value = *av_fetch(attr, 1, 0);
-			CK_ULONG _len = sv_len(_value);
-
-			_pPrivateKeyTemplate[i].pValue = (void*)SvPV(_value, _len);
-			_pPrivateKeyTemplate[i].ulValueLen = _len;
-
-			ulPrivateKeyAttributeCount++;
+		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
+			croak("Error: wrong argument");
 		}
+		AV* attr = (AV*)SvRV(*elem);
+		if ( av_len(attr) != 1 ) { // 2
+			croak("Illegal array length in argument");
+		}
+
+		_pPrivateKeyTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
+
+		SV* _value = *av_fetch(attr, 1, 0);
+		CK_ULONG _len = sv_len(_value);
+
+		_pPrivateKeyTemplate[i].pValue = (void*)SvPV(_value, _len);
+		_pPrivateKeyTemplate[i].ulValueLen = _len;
+
+		ulPrivateKeyAttributeCount++;
 	}
 
 	RETVAL = fl->C_GenerateKeyPair(hSession,&_pMechanism,
@@ -440,4 +446,53 @@ OUTPUT:
 	RETVAL
 
 
+
+
+CK_RV
+C_GetAttributeValue(fl,hSession,hObject,pTemplate)
+	Crypt::Cryptoki::Raw::FunctionList	fl
+	CK_SESSION_HANDLE 					hSession
+	CK_OBJECT_HANDLE 					hObject
+	AV*				 					pTemplate
+CODE:
+	CK_ATTRIBUTE_PTR _pTemplate;
+	CK_ULONG ulCount = 0;
+	Newxz(_pTemplate, av_len(pTemplate)+1, CK_ATTRIBUTE);
+
+	int i = 0;
+	for(i=0;i<=av_len(pTemplate);++i){
+		SV** elem = av_fetch(pTemplate, i, 0);
+		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
+			croak("Error: wrong argument");
+		}
+		AV* attr = (AV*)SvRV(*elem);
+		if ( av_len(attr) != 1 ) { // 2
+			croak("Illegal array length in argument");
+		}
+		_pTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
+		_pTemplate[i].pValue = NULL;
+		_pTemplate[i].ulValueLen = 0;
+		ulCount++;
+	}
+
+	RETVAL = fl->C_GetAttributeValue(hSession,hObject,_pTemplate,ulCount);
+	if ( RETVAL == CKR_OK ) {
+		for(i=0;i<ulCount;++i){
+			printf("len: %lu\n", _pTemplate[i].ulValueLen);
+			if ( _pTemplate[i].ulValueLen == -1 ) {
+				croak("Error: attribute %d",i);
+			}
+			Newx(_pTemplate[i].pValue,_pTemplate[i].ulValueLen,CK_BYTE);
+		}
+
+		RETVAL = fl->C_GetAttributeValue(hSession,hObject,_pTemplate,ulCount);
+		if ( RETVAL == CKR_OK ) {
+			for(i=0;i<ulCount;++i){
+				AV* attr = (AV*)SvRV(*av_fetch(pTemplate, i, 0));
+				av_store(attr, 1, newSVpv(_pTemplate[i].pValue, _pTemplate[i].ulValueLen));
+			}
+		}
+	}
+OUTPUT:
+	RETVAL
 

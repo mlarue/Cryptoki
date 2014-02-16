@@ -5,110 +5,59 @@ use Carp;
 
 use Crypt::Cryptoki::Raw qw(
 	CKA_CLASS  CKO_PUBLIC_KEY  CKO_PRIVATE_KEY
-	CKA_KEY_TYPE  CKK_RSA
-	CKA_TOKEN  TRUE
-	CKA_ENCRYPT
-	CKA_DECRYPT
-	CKA_VERIFY
-	CKA_SIGN
-	CKA_WRAP
-	CKA_UNWRAP
-	CKA_MODULUS_BITS
-	CKA_PUBLIC_EXPONENT
-	CKA_LABEL
-	CKA_ID
 );
 
-has 'class' => ( is => 'ro' );
-has 'key_type' => ( is => 'ro' );
-has 'token' => ( is => 'ro' );
-has 'encrypt' => ( is => 'ro' );
-has 'decrypt' => ( is => 'ro' );
-has 'verify' => ( is => 'ro' );
-has 'sign' => ( is => 'ro' );
-has 'wrap' => ( is => 'ro' );
-has 'unwrap' => ( is => 'ro' );
-has 'modulus_bits' => ( is => 'ro' );
-has 'public_exponent' => ( is => 'ro' );
-has 'label' => ( is => 'ro' );
-has 'id' => ( is => 'ro' );
+has 'class' => ( is => 'ro', default => 0 );
 
-has 'template' => ( is => 'lazy' );
+my $class_map = {
+	public_key => CKO_PUBLIC_KEY,
+	private_key => CKO_PRIVATE_KEY
+};
+my $reverse_class_map = { reverse %$class_map };
 
-sub _build_template {
-	my $self = shift;
+sub _attribute_map {+{
+	class => [
+		CKA_CLASS, sub{pack('Q',$class_map->{shift()})}, sub{$reverse_class_map->{unpack('Q',@_)}}
+	]
+}}
 
-	my @attrs;
+sub build_template {
+	my ( $self, @attributes ) = @_;
 
-	if ( $self->class ) {
-		my %m = (
-			public_key => CKO_PUBLIC_KEY,
-			private_key => CKO_PRIVATE_KEY
-		);
-		defined $m{$self->class} or croak 'illegal class'; 
-		push @attrs, [ CKA_CLASS, pack('Q',$m{$self->class}) ];
+	my $map = $self->_attribute_map;
+
+	unless ( @attributes ) {
+		@attributes = keys $map;
 	}
 
-	if ( $self->key_type ) {
-		my %m = (
-			rsa => CKK_RSA,
-		);
-		defined $m{$self->key_type} or croak 'illegal key_type'; 
-		push @attrs, [ CKA_KEY_TYPE, pack('Q',$m{$self->key_type}) ];
+	my $template = [];
+	for (@attributes) {
+		exists $map->{$_} or croak 'illegal attribute';
+		my $v = $map->{$_};
+		push @$template, [ $v->[0], $v->[1]->( $self->$_ ) ];
 	}
 
-	if ( $self->token ) {
-		# bool
-		push @attrs, [ CKA_TOKEN, pack('C',$self->token) ];
+	return $template;
+}
+
+sub parse_template {
+	my ( $self, $template, @attributes ) = @_;
+
+	my $map = $self->_attribute_map;
+
+	unless ( @attributes ) {
+		@attributes = keys $map;
 	}
 
-	if ( $self->encrypt ) {
-		# bool
-		push @attrs, [ CKA_ENCRYPT, pack('C',$self->encrypt) ];
+	for (@$template) {
+		exists $map->{$_} or croak 'illegal attribute';
+		my $v = $map->{$_};
+
+		$self->$_->( )
+		push @$template, [ $v->[0], $v->[1]->( $self->$_ ) ];
 	}
 
-	if ( $self->decrypt ) {
-		# bool
-		push @attrs, [ CKA_DECRYPT, pack('C',$self->decrypt) ];
-	}
-
-	if ( $self->sign ) {
-		# bool
-		push @attrs, [ CKA_SIGN, pack('C',$self->sign) ];
-	}
-
-	if ( $self->verify ) {
-		# bool
-		push @attrs, [ CKA_VERIFY, pack('C',$self->verify) ];
-	}
-
-	if ( $self->wrap ) {
-		# bool
-		push @attrs, [ CKA_WRAP, pack('C',$self->wrap) ];
-	}
-
-	if ( $self->unwrap ) {
-		# bool
-		push @attrs, [ CKA_UNWRAP, pack('C',$self->unwrap) ];
-	}
-
-	if ( $self->modulus_bits ) {
-		push @attrs, [ CKA_MODULUS_BITS, pack('Q',$self->modulus_bits) ];
-	}
-
-	if ( $self->public_exponent ) {
-		push @attrs, [ CKA_PUBLIC_EXPONENT, $self->public_exponent ];
-	}
-
-	if ( $self->label ) {
-		push @attrs, [ CKA_LABEL, $self->label ];
-	}
-
-	if ( $self->id ) {
-		push @attrs, [ CKA_ID, $self->id ];
-	}
-
-	return \@attrs;
+	return $template;
 }
 
 1;

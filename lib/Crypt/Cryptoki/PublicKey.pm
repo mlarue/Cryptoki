@@ -9,10 +9,9 @@ use Crypt::Cryptoki::Raw qw(rv_to_str CKR_OK NULL_PTR
 	CKA_MODULUS CKA_PUBLIC_EXPONENT
 );
 
-sub _attribute_map {{
-	modulus 		=> CKA_MODULUS,
-	public_exponent => CKA_PUBLIC_EXPONENT
-}};
+sub _template_class {
+	'Crypt::Cryptoki::Template::RSAPublicKey'
+}
 
 sub export_as_string {
 	my ( $self ) = @_;

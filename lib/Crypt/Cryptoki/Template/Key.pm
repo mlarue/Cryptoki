@@ -20,10 +20,12 @@ my $reverse_kt_map = { reverse %$kt_map };
 sub _attribute_map {+{
 	%{shift->SUPER::_attribute_map},
 	key_type => [ 
-		CKA_KEY_TYPE, sub{pack('Q',$kt_map->{shift()})}, sub{$reverse_kt_map->{unpack('Q',@_)}} 
+		CKA_KEY_TYPE, 
+		sub{pack('Q',$kt_map->{$_[0]})}, 
+		sub{$reverse_kt_map->{unpack('Q',$_[0])}} 
 	],
 	id => [
-		CKA_ID, sub{shift}, sub{@_} 
+		CKA_ID, sub{$_[0]}, sub{$_[0]} 
 	]
 }}
 

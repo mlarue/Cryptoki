@@ -481,7 +481,7 @@ CODE:
 	RETVAL = fl->C_GetAttributeValue(hSession,hObject,_pTemplate,ulCount);
 	if ( RETVAL == CKR_OK ) {
 		for(i=0;i<ulCount;++i){
-			printf("len: %lu\n", _pTemplate[i].ulValueLen);
+			// printf("len: %lu\n", _pTemplate[i].ulValueLen);
 			if ( _pTemplate[i].ulValueLen == -1 ) {
 				croak("Error: attribute %d",i);
 			}

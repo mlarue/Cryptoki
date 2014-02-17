@@ -17,11 +17,18 @@ my $reverse_class_map = { reverse %$class_map };
 
 sub _attribute_map {+{
 	class => [
-		CKA_CLASS, sub{pack('Q',$class_map->{shift()})}, sub{$reverse_class_map->{unpack('Q',@_)}}
+		CKA_CLASS, 
+		sub{pack('Q',$class_map->{$_[0]})}, 
+		sub{$reverse_class_map->{unpack('Q',$_[0])}}
 	]
 }}
 
-sub build_template {
+sub _reverse_attribute_map {
+	my $self = shift;
+	+{ map { $self->_attribute_map->{$_}[0] => $_ } keys %{$self->_attribute_map} }
+}; 
+
+sub build {
 	my ( $self, @attributes ) = @_;
 
 	my $map = $self->_attribute_map;
@@ -32,32 +39,27 @@ sub build_template {
 
 	my $template = [];
 	for (@attributes) {
-		exists $map->{$_} or croak 'illegal attribute';
+		exists $map->{$_} or croak "illegal attribute: $_";
 		my $v = $map->{$_};
+		#print STDERR $_, ' ', $self->$_, ' ', unpack('H*',$v->[1]->($self->$_)), "\n";
 		push @$template, [ $v->[0], $v->[1]->( $self->$_ ) ];
 	}
 
 	return $template;
 }
 
-sub parse_template {
-	my ( $self, $template, @attributes ) = @_;
+sub parse {
+	my ( $self, $template ) = @_;
 
 	my $map = $self->_attribute_map;
 
-	unless ( @attributes ) {
-		@attributes = keys $map;
-	}
-
+	my $result = {};
 	for (@$template) {
-		exists $map->{$_} or croak 'illegal attribute';
-		my $v = $map->{$_};
-
-		$self->$_->( )
-		push @$template, [ $v->[0], $v->[1]->( $self->$_ ) ];
+		my $name = $self->_reverse_attribute_map->{$_->[0]};
+		$result->{$name} = $map->{$name}->[2]->($_->[1]);
 	}
 
-	return $template;
+	return $result;
 }
 
 1;

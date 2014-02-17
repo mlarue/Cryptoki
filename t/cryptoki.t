@@ -5,7 +5,8 @@ use Test::More;
 use Try::Tiny;
 
 use_ok 'Crypt::Cryptoki';
-use_ok 'Crypt::Cryptoki::Template';
+use_ok 'Crypt::Cryptoki::Template::RSAPublicKey';
+use_ok 'Crypt::Cryptoki::Template::RSAPrivateKey';
 
 my $c = Crypt::Cryptoki->new(module=>'/usr/lib64/softhsm/libsofthsm.so');
 
@@ -27,9 +28,7 @@ diag $session->login_user('1234');
 # or
 # diag $session->login_so('1234');
 
-my $t_public = Crypt::Cryptoki::Template->new(
-	class => 'public_key',
-	key_type => 'rsa',
+my $t_public = Crypt::Cryptoki::Template::RSAPublicKey->new(
 	token => 1,
 	encrypt => 1,
 	verify => 1,
@@ -40,9 +39,7 @@ my $t_public = Crypt::Cryptoki::Template->new(
 	id => pack('C*', 0x01, 0x02, 0x03)
 );
 
-my $t_private = Crypt::Cryptoki::Template->new(
-	class => 'private_key',
-	key_type => 'rsa',
+my $t_private = Crypt::Cryptoki::Template::RSAPrivateKey->new(
 	token => 1,
 	decrypt => 1,
 	sign => 1,
@@ -51,7 +48,13 @@ my $t_private = Crypt::Cryptoki::Template->new(
 	id => pack('C*', 0x01, 0x02, 0x03)
 );
 
-my ( $public_key, $private_key ) = $session->generate_key_pair($t_public,$t_private);
+diag explain $t_private;
+
+my ( $public_key, $private_key ) = $session->generate_key_pair(
+	$t_public->build(qw(class key_type token encrypt verify wrap modulus_bits
+		public_exponent label id)),
+	$t_private->build(qw(class key_type token decrypt sign unwrap label id)),
+);
 
 try {
 	my $plain_text = 'plain text';
@@ -60,7 +63,7 @@ try {
 	( $encrypted_text_ref ) = $private_key->decrypt($encrypted_text_ref, $len);
 	diag $$encrypted_text_ref;
 
-	diag explain $public_key->hex_attributes;
+	diag explain $public_key->attributes;
 	diag $public_key->export_as_string;
 } catch { diag $_; 0 };
 

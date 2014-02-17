@@ -18,14 +18,14 @@ has 'wrap' => ( is => 'ro', default => 0 );
 
 sub _attribute_map {+{
 	%{shift->SUPER::_attribute_map},
-	encrypt 		=> [ 
-		CKA_ENCRYPT, sub{pack('C',shift)}, sub{unpack('C',@_)} 
+	encrypt => [ 
+		CKA_ENCRYPT, sub{pack('C',$_[0])}, sub{unpack('C',$_[0])} 
 	],
-	modulus_bits	=> [ 
-		CKA_VERIFY, sub{pack('C',@_)}, sub{unpack('C',@_)} 
+	verify => [ 
+		CKA_VERIFY, sub{pack('C',$_[0])}, sub{unpack('C',$_[0])} 
 	],
-	public_exponent => [
-		CKA_WRAP, sub{pack('C',@_)}, sub{unpack('C',@_)} 
+	wrap => [
+		CKA_WRAP, sub{pack('C',$_[0])}, sub{unpack('C',$_[0])} 
 	]
 }}
 

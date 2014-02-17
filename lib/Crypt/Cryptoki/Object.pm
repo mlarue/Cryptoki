@@ -15,20 +15,14 @@ sub _build__fl {
 	shift->session->slot->ctx->_fl;
 }
 
-sub _attribute_map {{
-}}
+sub _template_class {
+	'Crypt::Cryptoki::Template'
+}
 
 sub _build_attributes {
 	my ( $self ) = @_;
-	my @attr_names = keys %{$self->_attribute_map};
-	my @attrs = $self->get_attributes(@attr_names);
-	+{ zip @attr_names, @attrs };
-}
-
-sub hex_attributes {
-	my ( $self ) = @_;
-	my $attrs = $self->attributes;
-	+{ map { $_ => unpack('H*',$attrs->{$_}) } keys %$attrs };
+	my @attr_names = keys %{$self->_template_class->_attribute_map};
+	$self->get_attributes(@attr_names);
 }
 
 sub destroy {
@@ -43,20 +37,17 @@ sub destroy {
 sub get_attributes {
 	my ( $self, @attributes ) = @_;
 
-	my @get_attributes_template;
-	for (@attributes) {
-		exists $self->_attribute_map->{$_} or croak 'illegal attribute';
-		push @get_attributes_template, [ $self->_attribute_map->{$_}, '' ];
-	}
+	my $template = $self->_template_class->new;
+	my $t = $template->build_template(@attributes);
 
 	my $rv = $self->_fl->C_GetAttributeValue(
-		$self->session->id,$self->id,\@get_attributes_template
+		$self->session->id,$self->id,$t
 	);
 	if ( $rv != CKR_OK ) {
 		croak rv_to_str($rv);
 	}
 
-	map { ''.$_->[1] } @get_attributes_template;
+	$template->parse($t);
 }
 
 1;

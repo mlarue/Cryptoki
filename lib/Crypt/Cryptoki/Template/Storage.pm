@@ -10,12 +10,12 @@ use Crypt::Cryptoki::Raw qw(
 );
 
 has 'token' => ( is => 'ro', default => 0 );
-has 'label' => ( is => 'ro' );
+has 'label' => ( is => 'ro', default => '' );
 
 sub _attribute_map {+{
 	%{shift->SUPER::_attribute_map},
-	token => [ CKA_TOKEN, sub{pack('C',shift)} ],
-	label => [ CKA_LABEL, sub{shift} ],
+	token => [ CKA_TOKEN, sub{pack('C',$_[0])}, sub{unpack('C',$_[0])} ],
+	label => [ CKA_LABEL, sub{$_[0]}, sub{$_[0]} ],
 }}
 
 1;

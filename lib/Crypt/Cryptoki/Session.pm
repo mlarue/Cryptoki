@@ -60,13 +60,18 @@ sub login_so {
  
 sub generate_key_pair {
 	my ( $self, $template_public_key, $template_private_key ) = @_;
+
+	#use Data::Dumper;
+	#print STDERR Dumper($template_public_key);
+	#print STDERR Dumper($template_private_key);
+
 	my $private_key = -1;
 	my $public_key = -1;
 	my $rv = $self->_fl->C_GenerateKeyPair(
 		$self->id, 
 		[ CKM_RSA_PKCS_KEY_PAIR_GEN, NULL_PTR, 0 ],
-		$template_public_key->template,
-		$template_private_key->template,
+		$template_public_key,
+		$template_private_key,
 		$public_key, 
 		$private_key
 	);

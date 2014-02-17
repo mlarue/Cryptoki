@@ -12,9 +12,9 @@ use Crypt::Cryptoki::Raw qw(
 
 has '+class' => ( default => 'public_key' );
 
-has 'encrypt' => ( is => 'ro', default => 0 );
-has 'verify' => ( is => 'ro', default => 0 );
-has 'wrap' => ( is => 'ro', default => 0 );
+has 'encrypt' => ( is => 'ro' );
+has 'verify' => ( is => 'ro' );
+has 'wrap' => ( is => 'ro' );
 
 sub _attribute_map {+{
 	%{shift->SUPER::_attribute_map},

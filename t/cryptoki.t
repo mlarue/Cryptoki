@@ -34,9 +34,9 @@ my $t_public = Crypt::Cryptoki::Template::RSAPublicKey->new(
 	verify => 1,
 	wrap => 1,
 	modulus_bits => 4096,
-	public_exponent => pack('C*', 0x01, 0x00, 0x01),
+	public_exponent => '0x010001',
 	label => 'test',
-	id => pack('C*', 0x01, 0x02, 0x03)
+	id => '0x123456',
 );
 
 my $t_private = Crypt::Cryptoki::Template::RSAPrivateKey->new(
@@ -48,13 +48,7 @@ my $t_private = Crypt::Cryptoki::Template::RSAPrivateKey->new(
 	id => pack('C*', 0x01, 0x02, 0x03)
 );
 
-diag explain $t_private;
-
-my ( $public_key, $private_key ) = $session->generate_key_pair(
-	$t_public->build(qw(class key_type token encrypt verify wrap modulus_bits
-		public_exponent label id)),
-	$t_private->build(qw(class key_type token decrypt sign unwrap label id)),
-);
+my ( $public_key, $private_key ) = $session->generate_key_pair($t_public,$t_private);
 
 try {
 	my $plain_text = 'plain text';
@@ -63,8 +57,11 @@ try {
 	( $encrypted_text_ref ) = $private_key->decrypt($encrypted_text_ref, $len);
 	diag $$encrypted_text_ref;
 
-	diag explain $public_key->attributes;
+	diag explain $public_key->get_attributes(1);
 	diag $public_key->export_as_string;
+
+	diag explain $private_key->get_attributes(1);
+
 } catch { diag $_; 0 };
 
 ok $public_key->destroy;

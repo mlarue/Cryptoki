@@ -7,7 +7,7 @@ use Crypt::Cryptoki::Raw qw(
 	CKA_CLASS  CKO_PUBLIC_KEY  CKO_PRIVATE_KEY
 );
 
-has 'class' => ( is => 'ro', default => 0 );
+has 'class' => ( is => 'ro' );
 
 my $class_map = {
 	public_key => CKO_PUBLIC_KEY,
@@ -32,31 +32,51 @@ sub build {
 	my ( $self, @attributes ) = @_;
 
 	my $map = $self->_attribute_map;
+	my $template = [];
 
+	my $forced = 1;
 	unless ( @attributes ) {
+		$forced = 0;
 		@attributes = keys $map;
 	}
+	#print STDERR "forced: $forced\n";
 
-	my $template = [];
-	for (@attributes) {
+	for ( @attributes ) {
 		exists $map->{$_} or croak "illegal attribute: $_";
 		my $v = $map->{$_};
-		#print STDERR $_, ' ', $self->$_, ' ', unpack('H*',$v->[1]->($self->$_)), "\n";
-		push @$template, [ $v->[0], $v->[1]->( $self->$_ ) ];
+		#print STDERR ": $_\n";
+		if ( defined ( my $value = $self->$_ ) ) {
+			if ( $v->[3] and $value =~ s/^0x// ) {
+				push @$template, [ $v->[0], $v->[1]->(pack('H*',$value)) ];
+			}
+			else {
+				push @$template, [ $v->[0], $v->[1]->($value) ];
+			}
+		}
+		elsif ( $forced ) {
+			# forced attribute, e.g. for GetAttribute templates
+			push @$template, [ $v->[0], '' ];
+		}
 	}
 
 	return $template;
 }
 
 sub parse {
-	my ( $self, $template ) = @_;
+	my ( $self, $template, $armored ) = @_;
 
 	my $map = $self->_attribute_map;
 
 	my $result = {};
 	for (@$template) {
 		my $name = $self->_reverse_attribute_map->{$_->[0]};
-		$result->{$name} = $map->{$name}->[2]->($_->[1]);
+		my $v = $map->{$name};
+		if ( $armored and $v->[3] ) {
+			$result->{$name} = '0x'.unpack('H*',$v->[2]->($_->[1]));
+		}
+		else {
+			$result->{$name} = $v->[2]->($_->[1]);
+		}
 	}
 
 	return $result;

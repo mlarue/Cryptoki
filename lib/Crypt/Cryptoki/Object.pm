@@ -8,7 +8,6 @@ use Crypt::Cryptoki::Raw qw(rv_to_str CKR_OK);
 
 has 'session' => ( is => 'ro', required => 1 );
 has 'id' => ( is => 'ro', required => 1 );
-has 'attributes' => ( is => 'lazy' );
 has '_fl' => ( is => 'lazy' );
 
 sub _build__fl {
@@ -17,12 +16,6 @@ sub _build__fl {
 
 sub _template_class {
 	'Crypt::Cryptoki::Template'
-}
-
-sub _build_attributes {
-	my ( $self ) = @_;
-	my @attr_names = keys %{$self->_template_class->_attribute_map};
-	$self->get_attributes(@attr_names);
 }
 
 sub destroy {
@@ -35,10 +28,14 @@ sub destroy {
 }
 
 sub get_attributes {
-	my ( $self, @attributes ) = @_;
+	my ( $self, $armored, @attributes ) = @_;
 
 	my $template = $self->_template_class->new;
-	my $t = $template->build_template(@attributes);
+	unless ( @attributes ) {
+		@attributes = keys %{$template->_attribute_map};
+	}
+
+	my $t = $template->build(@attributes);
 
 	my $rv = $self->_fl->C_GetAttributeValue(
 		$self->session->id,$self->id,$t
@@ -47,7 +44,7 @@ sub get_attributes {
 		croak rv_to_str($rv);
 	}
 
-	$template->parse($t);
+	$template->parse($t,$armored);
 }
 
 1;

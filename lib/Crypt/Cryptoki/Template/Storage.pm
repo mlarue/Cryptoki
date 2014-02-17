@@ -9,8 +9,8 @@ use Crypt::Cryptoki::Raw qw(
 	CKA_LABEL
 );
 
-has 'token' => ( is => 'ro', default => 0 );
-has 'label' => ( is => 'ro', default => '' );
+has 'token' => ( is => 'ro' );
+has 'label' => ( is => 'ro' );
 
 sub _attribute_map {+{
 	%{shift->SUPER::_attribute_map},

@@ -15,7 +15,7 @@ sub _template_class {
 
 sub export_as_string {
 	my ( $self ) = @_;
-	my $attrs = $self->attributes;
+	my $attrs = $self->get_attributes(0,'modulus','public_exponent');
 	require Crypt::OpenSSL::Bignum;
 	require Crypt::OpenSSL::RSA;
 	my $n = Crypt::OpenSSL::Bignum->new_from_bin($attrs->{modulus});

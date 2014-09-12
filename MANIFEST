@@ -11,6 +11,7 @@ lib/Crypt/Cryptoki/Object.pm
 lib/Crypt/Cryptoki/PrivateKey.pm
 lib/Crypt/Cryptoki/PublicKey.pm
 lib/Crypt/Cryptoki/Raw.pm
+lib/Crypt/Cryptoki/Raw.xs
 lib/Crypt/Cryptoki/Session.pm
 lib/Crypt/Cryptoki/Slot.pm
 lib/Crypt/Cryptoki/SlotWithToken.pm
@@ -25,8 +26,6 @@ MANIFEST			This list of files
 META.json
 META.yml
 README.pod
-src/Crypt-Cryptoki-Raw-FunctionList.xs
-src/Crypt-Cryptoki-Raw.xs
 t/auto/000-use.t
 t/auto/raw/000-use.t
 t/cryptoki-raw.t

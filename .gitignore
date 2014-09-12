@@ -6,7 +6,8 @@ Build
 _build
 *.bak
 MYMETA.*
-src/Crypt-Cryptoki-Raw-FunctionList.c
 blib
 include/ppport.h
-src/const-c.inc
+lib/Crypt/Cryptoki/const-c.inc
+lib/Crypt/Cryptoki/const-xs.inc
+lib/Crypt/Cryptoki/Raw.c

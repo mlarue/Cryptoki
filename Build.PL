@@ -30,6 +30,7 @@ my $build = Crypt::Cryptoki::Build->new(
 		'ExtUtils::CBuilder' => 0,
 		'ExtUtils::Constant' => 0,
 		'ExtUtils::ParseXS' => 0,
+		'Devel::PPPort' => 0,
 	},
 	test_requires => {
 		'Crypt::OpenSSL::Bignum' => 0,
@@ -134,7 +135,8 @@ require ExtUtils::Constant;
     XS_FILE      => 'src/const-xs.inc',
   );
 
-
+require Devel::PPPort;
+Devel::PPPort::WriteFile('include/ppport.h');
 
 $build->create_build_script;
 

@@ -21,7 +21,7 @@ my $build = Crypt::Cryptoki::Build->new(
 	module_name => 'Crypt::Cryptoki',
 	license => 'perl',
 	requires => {
-                'perl' => '5.12.5',
+		'perl' => '5.14.0',
 	},
 	configure_requires => { 
 		'Module::Build' => 0 
@@ -30,6 +30,10 @@ my $build = Crypt::Cryptoki::Build->new(
 		'ExtUtils::CBuilder' => 0,
 		'ExtUtils::Constant' => 0,
 		'ExtUtils::ParseXS' => 0,
+	},
+	test_requires => {
+		'Crypt::OpenSSL::Bignum' => 0,
+		'Crypt::OpenSSL::RSA' => 0,
 	},
 	extra_compiler_flags => ['-Wall'],
 	include_dirs => ['include'],

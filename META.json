@@ -28,7 +28,13 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "v5.12.5"
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Crypt::OpenSSL::Bignum" : "0",
+            "Crypt::OpenSSL::RSA" : "0"
          }
       }
    },
@@ -36,6 +42,9 @@
       "Crypt::Cryptoki" : {
          "file" : "lib/Crypt/Cryptoki.pm",
          "version" : "0.01_07"
+      },
+      "Crypt::Cryptoki::Raw" : {
+         "file" : "lib/Crypt/Cryptoki/Raw.pm"
       }
    },
    "release_status" : "testing",

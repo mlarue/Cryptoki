@@ -11,3 +11,4 @@
 ^lib/.*\.(c|xs|o)$
 ^src/.*\.(c|o|inc)$
 \.tar\.gz$
+^.project$

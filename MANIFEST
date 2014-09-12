@@ -5,7 +5,6 @@ include/cryptoki/pkcs-11v2-20.pdf
 include/cryptoki/pkcs11.h
 include/cryptoki/pkcs11f.h
 include/cryptoki/pkcs11t.h
-include/ppport.h
 lib/Crypt/Cryptoki.pm
 lib/Crypt/Cryptoki/Key.pm
 lib/Crypt/Cryptoki/Object.pm

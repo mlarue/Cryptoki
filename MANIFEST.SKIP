@@ -2,7 +2,6 @@
 ^\.git
 \.bak$
 ~$
-^src/Crypt-Cryptoki-FunctionList.c
 ^MYMETA\.yml$
 ^MYMETA\.json$
 ^Build$
@@ -12,3 +11,4 @@
 ^src/.*\.(c|o|inc)$
 \.tar\.gz$
 ^.project$
+^include/ppport.h$

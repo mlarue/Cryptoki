@@ -13,6 +13,11 @@ typedef struct raw {
 
 typedef raw_t* Crypt__Cryptoki__Raw;
 
+CK_RV notify_callback(CK_SESSION_HANDLE hSession, CK_NOTIFICATION event,CK_VOID_PTR pApplication) {
+	warn("notify\n");
+	return CKR_OK;
+}
+
 
 MODULE = Crypt::Cryptoki::Raw										PACKAGE = Crypt::Cryptoki::Raw		
 
@@ -186,7 +191,10 @@ C_OpenSession(self,slotID,flags,phSession)
 //	CK_NOTIFY 			Notify
 	CK_SESSION_HANDLE	 	phSession
 CODE:
-	RETVAL = self->function_list->C_OpenSession(slotID,flags,NULL_PTR,NULL_PTR,&phSession);
+	// TODO: pass perl callback to wrapper and call it there
+	CK_NOTIFY Notify = &notify_callback;
+
+	RETVAL = self->function_list->C_OpenSession(slotID,flags,NULL_PTR,Notify,&phSession);
 OUTPUT:
 	RETVAL
 	phSession
@@ -350,6 +358,59 @@ OUTPUT:
 	RETVAL
 	pEncryptedData
 	ulEncryptedDataLen
+
+
+
+
+CK_RV
+C_EncryptUpdate(self,hSession,pPart,ulPartLen,pEncryptedPart,ulEncryptedPartLen)
+	Crypt::Cryptoki::Raw	self
+	CK_SESSION_HANDLE 		hSession
+	char* 								pPart
+	CK_ULONG 							ulPartLen
+	SV*				 						pEncryptedPart
+	CK_ULONG 							ulEncryptedPartLen
+CODE:
+	CK_BYTE_PTR _pEncryptedPart;
+	Newx(_pEncryptedPart,ulEncryptedPartLen,CK_BYTE);
+
+	RETVAL = self->function_list->C_EncryptUpdate(
+		hSession,(CK_BYTE_PTR)pPart,ulPartLen,_pEncryptedPart,&ulEncryptedPartLen
+	);
+	
+	if ( RETVAL==CKR_OK ) {
+		*pEncryptedPart = *newSVpv((char*)_pEncryptedPart,ulEncryptedPartLen);
+	}
+OUTPUT:
+	RETVAL
+	pEncryptedPart
+	ulEncryptedPartLen
+
+
+
+CK_RV
+C_EncryptFinal(self,hSession,pEncryptedPart,ulEncryptedPartLen)
+	Crypt::Cryptoki::Raw	self
+	CK_SESSION_HANDLE 		hSession
+	SV*				 						pEncryptedPart
+	CK_ULONG 							ulEncryptedPartLen
+CODE:
+	CK_BYTE_PTR _pEncryptedPart;
+	Newx(_pEncryptedPart,ulEncryptedPartLen,CK_BYTE);
+
+	RETVAL = self->function_list->C_EncryptFinal(
+		hSession,_pEncryptedPart,&ulEncryptedPartLen
+	);
+	
+	if ( RETVAL==CKR_OK ) {
+		*pEncryptedPart = *newSVpv((char*)_pEncryptedPart,ulEncryptedPartLen);
+	}
+OUTPUT:
+	RETVAL
+	pEncryptedPart
+	ulEncryptedPartLen
+
+
 
 
 

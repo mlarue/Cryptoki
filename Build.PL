@@ -24,14 +24,14 @@ my $build = Module::Build->new(
 	},
 	extra_compiler_flags => ['-Wall'],
 	include_dirs => ['include'],
-	autosplit => 'lib/Crypt/Cryptoki/Raw.pm',
+	autosplit => 'lib/Crypt/Cryptoki/Constant.pm',
 	recursive_test_files => 1,
 	test_files => 't/auto',
 );
 
 require ExtUtils::Constant;
 ExtUtils::Constant::WriteConstants(
-	NAME         => 'Crypt::Cryptoki',
+	NAME         => 'Crypt::Cryptoki::Constant',
 	NAMES        => [qw(
 		CK_NEED_ARG_LIST 
 	

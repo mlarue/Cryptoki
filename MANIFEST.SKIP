@@ -7,8 +7,9 @@
 ^Build$
 ^_build/
 ^blib/
-^lib/.*\.(c|xs|o)$
-^src/.*\.(c|o|inc)$
+^lib/.*\.(c|o)$
 \.tar\.gz$
 ^.project$
 ^include/ppport.h$
+^lib/Crypt/Cryptoki/const-c.inc$
+^lib/Crypt/Cryptoki/const-xs.inc$

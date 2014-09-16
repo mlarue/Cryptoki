@@ -1,38 +1,23 @@
-use warnings;
+package Crypt::Cryptoki::Constant;
+
 use strict;
+use warnings;
+use Carp;
 
-use Module::Build;
+require Exporter;
+use AutoLoader;
 
-my $build = Module::Build->new(
-	module_name => 'Crypt::Cryptoki',
-	license => 'perl',
-	requires => {
-		'perl' => '5.14.0',
-	},
-	configure_requires => { 
-		'Module::Build' => 0 
-	},
-	build_requires => {
-		'ExtUtils::CBuilder' => 0,
-		'ExtUtils::Constant' => 0,
-		'ExtUtils::ParseXS' => 0,
-		'Devel::PPPort' => 0,
-	},
-	test_requires => {
-		'Crypt::OpenSSL::Bignum' => 0,
-		'Crypt::OpenSSL::RSA' => 0,
-	},
-	extra_compiler_flags => ['-Wall'],
-	include_dirs => ['include'],
-	autosplit => 'lib/Crypt/Cryptoki/Constant.pm',
-	recursive_test_files => 1,
-	test_files => 't/auto',
-);
+our @ISA = qw(Exporter);
 
-require ExtUtils::Constant;
-ExtUtils::Constant::WriteConstants(
-	NAME         => 'Crypt::Cryptoki::Constant',
-	NAMES        => [qw(
+#
+# grep "define CK[A-Z]" include/cryptoki/pkcs11t.h | awk '{ print $2 }' | sort
+#
+
+our %EXPORT_TAGS = (
+	'helper' => [qw(
+		rv_to_str
+	)], 
+	'attributes' => [ qw(
 		CKA_AC_ISSUER
 		CKA_ALLOWED_MECHANISMS
 		CKA_ALWAYS_AUTHENTICATE
@@ -133,14 +118,20 @@ ExtUtils::Constant::WriteConstants(
 		CKA_WRAP
 		CKA_WRAP_TEMPLATE
 		CKA_WRAP_WITH_TRUSTED
+	)],
+	'certificates' => [qw(
 		CKC_VENDOR_DEFINED
 		CKC_WTLS
 		CKC_X_509
 		CKC_X_509_ATTR_CERT
+	)],
+	'derivations' => [qw(
 		CKD_NULL
 		CKD_SHA1_KDF
 		CKD_SHA1_KDF_ASN1
 		CKD_SHA1_KDF_CONCATENATE
+	)],	
+	'flags' => [qw(
 		CKF_ARRAY_ATTRIBUTE
 		CKF_CLOCK_ON_TOKEN
 		CKF_DECRYPT
@@ -194,15 +185,21 @@ ExtUtils::Constant::WriteConstants(
 		CKF_VERIFY_RECOVER
 		CKF_WRAP
 		CKF_WRITE_PROTECTED
+	)],
+	'mgf' => [qw(
 		CKG_MGF1_SHA1
 		CKG_MGF1_SHA224
 		CKG_MGF1_SHA256
 		CKG_MGF1_SHA384
 		CKG_MGF1_SHA512
+	)],
+	'hardware' => [qw(
 		CKH_CLOCK
 		CKH_MONOTONIC_COUNTER
 		CKH_USER_INTERFACE
 		CKH_VENDOR_DEFINED
+	)],
+	'key_types' => [qw(
 		CKK_ACTI
 		CKK_AES
 		CKK_ARIA
@@ -235,6 +232,8 @@ ExtUtils::Constant::WriteConstants(
 		CKK_TWOFISH
 		CKK_VENDOR_DEFINED
 		CKK_X9_42_DH
+	)],
+	'mechanisms' => [qw(
 		CKM_ACTI
 		CKM_ACTI_KEY_GEN
 		CKM_AES_CBC
@@ -492,8 +491,12 @@ ExtUtils::Constant::WriteConstants(
 		CKM_X9_42_DH_PARAMETER_GEN
 		CKM_X9_42_MQV_DERIVE
 		CKM_XOR_BASE_AND_DATA
+	)],
+	'notifications' => [qw(
 		CKN_OTP_CHANGED
 		CKN_SURRENDER
+	)],
+	'objects' => [qw(
 		CKO_CERTIFICATE
 		CKO_DATA
 		CKO_DOMAIN_PARAMETERS
@@ -504,7 +507,11 @@ ExtUtils::Constant::WriteConstants(
 		CKO_PUBLIC_KEY
 		CKO_SECRET_KEY
 		CKO_VENDOR_DEFINED
+	)],
+	'prfs' => [qw(
 		CKP_PKCS5_PBKD2_HMAC_SHA1
+	)],
+	'return_codes' => [qw(
 		CKR_ARGUMENTS_BAD
 		CKR_ATTRIBUTE_READ_ONLY
 		CKR_ATTRIBUTE_SENSITIVE
@@ -593,24 +600,137 @@ ExtUtils::Constant::WriteConstants(
 		CKR_WRAPPING_KEY_HANDLE_INVALID
 		CKR_WRAPPING_KEY_SIZE_RANGE
 		CKR_WRAPPING_KEY_TYPE_INCONSISTENT
+	)],
+	'states' => [qw(
 		CKS_RO_PUBLIC_SESSION
 		CKS_RO_USER_FUNCTIONS
 		CKS_RW_PUBLIC_SESSION
 		CKS_RW_SO_FUNCTIONS
 		CKS_RW_USER_FUNCTIONS
+	)],
+	'roles' => [qw(
 		CKU_CONTEXT_SPECIFIC
 		CKU_SO
 		CKU_USER
+	)],
+	'salt_sources' => [qw(
 		CKZ_DATA_SPECIFIED
 		CKZ_SALT_SPECIFIED
-	)],
-	DEFAULT_TYPE => 'IV',
-	C_FILE       => 'lib/Crypt/Cryptoki/const-c.inc',
-	XS_FILE      => 'lib/Crypt/Cryptoki/const-xs.inc',
+	)]
 );
 
-require Devel::PPPort;
-Devel::PPPort::WriteFile('include/ppport.h');
+$EXPORT_TAGS{all} = [
+	@{$EXPORT_TAGS{helper}},
+	@{$EXPORT_TAGS{attributes}},
+	@{$EXPORT_TAGS{certificates}},
+	@{$EXPORT_TAGS{flags}},
+	@{$EXPORT_TAGS{key_types}},
+	@{$EXPORT_TAGS{mechanisms}},
+	@{$EXPORT_TAGS{return_codes}},
+	@{$EXPORT_TAGS{roles}},
+	@{$EXPORT_TAGS{objects}},
+	@{$EXPORT_TAGS{return_codes}},
+	@{$EXPORT_TAGS{states}},
+];
 
-$build->create_build_script;
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
+sub AUTOLOAD {
+    # This AUTOLOAD is used to 'autoload' constants from the constant()
+    # XS function.
+
+    my $constname;
+    our $AUTOLOAD;
+    ($constname = $AUTOLOAD) =~ s/.*:://;
+    croak "&Crypt::Cryptoki::Constant::constant not defined" if $constname eq 'constant';
+    my ($error, $val) = constant($constname);
+    if ($error) { croak $error; }
+    {
+		no strict 'refs';
+	    *$AUTOLOAD = sub { $val };
+    }
+    goto &$AUTOLOAD;
+}
+
+require XSLoader;
+XSLoader::load('Crypt::Cryptoki::Constant');
+
+# Preloaded methods go here.
+
+# Autoload methods go after =cut, and are processed by the autosplit program.
+
+my %rv_map;
+{
+	no strict 'refs';
+	%rv_map = map { $_->() => $_ } grep { /^CKR/ } @EXPORT_OK;
+}
+
+sub rv_to_str {
+	my ( $err_num ) = @_;
+	return $rv_map{$err_num} || 'n/a ('.$err_num.')';
+}
+
+1;
+__END__
+=head1 NAME
+
+Crypt::Cryptoki::Constant - PKCS#11 constants
+
+=head1 SYNOPSIS
+
+	use Crypt::Cryptoki::Constant qw(:all);
+
+	is(CKR_OK, 0, 'CKR_OK');
+	
+	(see also: t/constant.t)
+
+
+=head1 DESCRIPTION
+
+Crypt::Cryptoki::Constant can export all Cryptoki constants. These are organized by export tags.
+
+=head2 FUNCTIONS
+
+=head3 rv_to_str
+	
+Maps return codes (CKR_*) to the name of the constant
+
+	print "function returned: ", rv_to_str(CKR_OK), "\n";
+
+=head2 EXPORT
+
+None by default.
+
+=head2 Exportable constants
+
+	certificates (CKC_*)
+	derivations (CKD_*)
+	return_codes (CKR_*) 
+	flags (CKF_*) 
+	roles (CKU_*) 
+	objects (CKO_*)
+	key_types (CKK_*)
+	states (CKS_*)
+	attributes (CKA_*)
+	mechanisms (CKM_*)
+	helper (rv_to_str)
+	all
+
+=head1 SEE ALSO
+
+L<Crypt::Cryptoki>, L<Crypt::Cryptoki::Raw> 
+
+=head1 AUTHOR
+
+Markus Lauer, E<lt>mlarue@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Markus Lauer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

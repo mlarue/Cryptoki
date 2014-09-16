@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Devel::PPPort" : "0",
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::Constant" : "0",
             "ExtUtils::ParseXS" : "0"
@@ -43,8 +44,53 @@
          "file" : "lib/Crypt/Cryptoki.pm",
          "version" : "0.01_07"
       },
+      "Crypt::Cryptoki::Constant" : {
+         "file" : "lib/Crypt/Cryptoki/Constant.pm"
+      },
+      "Crypt::Cryptoki::Key" : {
+         "file" : "lib/Crypt/Cryptoki/Key.pm"
+      },
+      "Crypt::Cryptoki::Object" : {
+         "file" : "lib/Crypt/Cryptoki/Object.pm"
+      },
+      "Crypt::Cryptoki::PrivateKey" : {
+         "file" : "lib/Crypt/Cryptoki/PrivateKey.pm"
+      },
+      "Crypt::Cryptoki::PublicKey" : {
+         "file" : "lib/Crypt/Cryptoki/PublicKey.pm"
+      },
       "Crypt::Cryptoki::Raw" : {
          "file" : "lib/Crypt/Cryptoki/Raw.pm"
+      },
+      "Crypt::Cryptoki::Session" : {
+         "file" : "lib/Crypt/Cryptoki/Session.pm"
+      },
+      "Crypt::Cryptoki::Slot" : {
+         "file" : "lib/Crypt/Cryptoki/Slot.pm"
+      },
+      "Crypt::Cryptoki::SlotWithToken" : {
+         "file" : "lib/Crypt/Cryptoki/SlotWithToken.pm"
+      },
+      "Crypt::Cryptoki::Template" : {
+         "file" : "lib/Crypt/Cryptoki/Template.pm"
+      },
+      "Crypt::Cryptoki::Template::Key" : {
+         "file" : "lib/Crypt/Cryptoki/Template/Key.pm"
+      },
+      "Crypt::Cryptoki::Template::PrivateKey" : {
+         "file" : "lib/Crypt/Cryptoki/Template/PrivateKey.pm"
+      },
+      "Crypt::Cryptoki::Template::PublicKey" : {
+         "file" : "lib/Crypt/Cryptoki/Template/PublicKey.pm"
+      },
+      "Crypt::Cryptoki::Template::RSAPrivateKey" : {
+         "file" : "lib/Crypt/Cryptoki/Template/RSAPrivateKey.pm"
+      },
+      "Crypt::Cryptoki::Template::RSAPublicKey" : {
+         "file" : "lib/Crypt/Cryptoki/Template/RSAPublicKey.pm"
+      },
+      "Crypt::Cryptoki::Template::Storage" : {
+         "file" : "lib/Crypt/Cryptoki/Template/Storage.pm"
       }
    },
    "release_status" : "testing",

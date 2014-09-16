@@ -1,7 +1,8 @@
 package Crypt::Cryptoki;
 use strict;
 
-our $VERSION = '0.01_09';
+our $VERSION = '0.01';
+$VERSION = eval $VERSION;
 
 1;
 __END__

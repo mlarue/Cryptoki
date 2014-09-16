@@ -8,22 +8,8 @@ include/cryptoki/pkcs11t.h
 lib/Crypt/Cryptoki.pm
 lib/Crypt/Cryptoki/Constant.pm
 lib/Crypt/Cryptoki/Constant.xs
-lib/Crypt/Cryptoki/Key.pm
-lib/Crypt/Cryptoki/Object.pm
-lib/Crypt/Cryptoki/PrivateKey.pm
-lib/Crypt/Cryptoki/PublicKey.pm
 lib/Crypt/Cryptoki/Raw.pm
 lib/Crypt/Cryptoki/Raw.xs
-lib/Crypt/Cryptoki/Session.pm
-lib/Crypt/Cryptoki/Slot.pm
-lib/Crypt/Cryptoki/SlotWithToken.pm
-lib/Crypt/Cryptoki/Template.pm
-lib/Crypt/Cryptoki/Template/Key.pm
-lib/Crypt/Cryptoki/Template/PrivateKey.pm
-lib/Crypt/Cryptoki/Template/PublicKey.pm
-lib/Crypt/Cryptoki/Template/RSAPrivateKey.pm
-lib/Crypt/Cryptoki/Template/RSAPublicKey.pm
-lib/Crypt/Cryptoki/Template/Storage.pm
 MANIFEST			This list of files
 META.json
 META.yml
@@ -35,5 +21,4 @@ t/cryptoki.t
 t/openssl.t
 t/raw.t
 t/softhsm.t
-t/template/rsa_public_key.t
 typemap

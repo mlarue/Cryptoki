@@ -22,6 +22,8 @@ provides:
   Crypt::Cryptoki:
     file: lib/Crypt/Cryptoki.pm
     version: 0.01_07
+  Crypt::Cryptoki::Constant:
+    file: lib/Crypt/Cryptoki/Constant.pm
   Crypt::Cryptoki::Key:
     file: lib/Crypt/Cryptoki/Key.pm
   Crypt::Cryptoki::Object:

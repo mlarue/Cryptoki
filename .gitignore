@@ -11,3 +11,4 @@ include/ppport.h
 lib/Crypt/Cryptoki/const-c.inc
 lib/Crypt/Cryptoki/const-xs.inc
 lib/Crypt/Cryptoki/Raw.c
+lib/Crypt/Cryptoki/Constant.c

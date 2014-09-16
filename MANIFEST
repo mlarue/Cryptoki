@@ -6,6 +6,8 @@ include/cryptoki/pkcs11.h
 include/cryptoki/pkcs11f.h
 include/cryptoki/pkcs11t.h
 lib/Crypt/Cryptoki.pm
+lib/Crypt/Cryptoki/Constant.pm
+lib/Crypt/Cryptoki/Constant.xs
 lib/Crypt/Cryptoki/Key.pm
 lib/Crypt/Cryptoki/Object.pm
 lib/Crypt/Cryptoki/PrivateKey.pm
@@ -28,9 +30,10 @@ META.yml
 README.pod
 t/auto/000-use.t
 t/auto/raw/000-use.t
-t/cryptoki-raw.t
+t/constant.t
 t/cryptoki.t
 t/openssl.t
+t/raw.t
 t/softhsm.t
 t/template/rsa_public_key.t
 typemap

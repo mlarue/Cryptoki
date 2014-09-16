@@ -42,7 +42,7 @@
    "provides" : {
       "Crypt::Cryptoki" : {
          "file" : "lib/Crypt/Cryptoki.pm",
-         "version" : "0.01_07"
+         "version" : "0.01_09"
       },
       "Crypt::Cryptoki::Constant" : {
          "file" : "lib/Crypt/Cryptoki/Constant.pm"
@@ -99,5 +99,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01_07"
+   "version" : "0.01_09"
 }

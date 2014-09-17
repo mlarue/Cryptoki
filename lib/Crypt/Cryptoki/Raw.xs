@@ -213,19 +213,42 @@ OUTPUT:
 CK_RV
 C_OpenSession(self,slotID,flags,phSession)
 	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID 			slotID
-	CK_FLAGS 			flags
-//	CK_VOID_PTR 			pApplication 
-//	CK_NOTIFY 			Notify
-	CK_SESSION_HANDLE	 	phSession
+	CK_SLOT_ID 						slotID
+	CK_FLAGS 							flags
+//	CK_VOID_PTR 				pApplication 
+//	CK_NOTIFY 					Notify
+	SV*										phSession
 CODE:
 	// TODO: pass perl callback to wrapper and call it there
 	CK_NOTIFY Notify = &notify_callback;
-
-	RETVAL = self->function_list->C_OpenSession(slotID,flags,NULL_PTR,Notify,&phSession);
+	CK_SESSION_HANDLE _hSession;
+	RETVAL = self->function_list->C_OpenSession(slotID,flags,NULL_PTR,Notify,&_hSession);
+	if ( RETVAL==CKR_OK ) {
+		*phSession = *newSViv(_hSession);
+	}
 OUTPUT:
 	RETVAL
 	phSession
+
+
+CK_RV
+C_CloseSession(self,hSession)
+	Crypt::Cryptoki::Raw	self
+	CK_SESSION_HANDLE 		hSession
+CODE:
+	RETVAL = self->function_list->C_CloseSession(hSession);
+OUTPUT:
+	RETVAL
+
+
+CK_RV
+C_CloseAllSessions(self,slotID)
+	Crypt::Cryptoki::Raw	self
+	CK_SLOT_ID						slotID
+CODE:
+	RETVAL = self->function_list->C_CloseAllSessions(slotID);
+OUTPUT:
+	RETVAL
 
 
 CK_RV
@@ -259,12 +282,18 @@ CODE:
 OUTPUT:
 	RETVAL
 
-# TODO: C_CloseSession
-# TODO: C_CloseAllSessions
-# TODO: C_GetSessionInfo
+
+CK_RV
+C_Logout(self,hSession)
+	Crypt::Cryptoki::Raw	self
+	CK_SESSION_HANDLE 		hSession
+CODE:
+	RETVAL = self->function_list->C_Logout(hSession);
+OUTPUT:
+	RETVAL
+
 # TODO: C_GetOperationState
 # TODO: C_SetOperationState
-# TODO: C_Logout
 
 
 ################################################################################

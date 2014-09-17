@@ -13,10 +13,14 @@ my $session = -1;
 is rv_to_str($raw->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,$session)), 'CKR_OK', 'C_OpenSession';
 diag $session;
 
-is($raw->C_SeedRandom($session, 'abc', 3), CKR_OK, 'C_SeedRandom');
+is($raw->C_SeedRandom($session, "a\n\0c", 4), CKR_OK, 'C_SeedRandom');
 
 my $random;
 is($raw->C_GenerateRandom($session, $random, 10), CKR_OK, 'C_GenerateRandom');
 diag 'random: ', unpack('H*', $random);
+
+is($raw->C_CloseSession($session), CKR_OK, 'C_CloseSession');
+
+is($raw->C_Finalize(), CKR_OK, 'C_Finalize');
 
 done_testing;

@@ -30,12 +30,8 @@ my @mechanism_flags = qw(
 
 sub flags_to_str {
 	my $flags = shift;
-	my @res = ();
-	for (@mechanism_flags) {
-		no strict 'refs';
-		push @res, $_ if $flags & $_->();
-	}	
-	join('|', @res);
+	no strict 'refs';
+	join('|', grep { $flags & $_->() } @mechanism_flags);
 }
 
 for ( @$mechanisms ) {

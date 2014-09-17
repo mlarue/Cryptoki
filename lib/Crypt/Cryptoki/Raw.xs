@@ -166,8 +166,8 @@ OUTPUT:
 CK_RV
 C_GetTokenInfo(self,slotID,pInfo)
 	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID				slotID
-	HV*						pInfo
+	CK_SLOT_ID						slotID
+	HV*										pInfo
 CODE:
 	CK_TOKEN_INFO _pInfo;
 	RETVAL = self->function_list->C_GetTokenInfo(slotID,&_pInfo);
@@ -197,14 +197,110 @@ OUTPUT:
 	RETVAL
 	pInfo
 
-# TODO: C_WaitForSlotEvent
-# TODO: C_GetMechanismList
-# TODO: C_GetMechanismInfo
-# TODO: C_InitToken
-# TODO: C_InitPIN
-# TODO: C_SetPIN
+
+CK_RV
+C_WaitForSlotEvent(self,flags,pSlot)
+	Crypt::Cryptoki::Raw	self
+	CK_FLAGS 							flags
+	SV*										pSlot
+CODE:
+	CK_SLOT_ID _slotID;
+	RETVAL = self->function_list->C_WaitForSlotEvent(flags,&_slotID,NULL_PTR);
+	if ( RETVAL==CKR_OK ) {
+		*pSlot = *newSViv(_slotID);
+	}
+OUTPUT:
+	RETVAL
+	pSlot
 
 
+CK_RV
+C_GetMechanismList(self,slotID,pMechanismList)
+	Crypt::Cryptoki::Raw	self
+	CK_SLOT_ID						slotID
+	AV*										pMechanismList
+CODE:
+	CK_ULONG pulCount;
+	RETVAL = self->function_list->C_GetMechanismList(slotID,NULL_PTR,&pulCount);
+	if ( RETVAL == CKR_OK ) {
+		CK_MECHANISM_TYPE_PTR _pMechanismList;
+		Newxz(_pMechanismList, pulCount, CK_MECHANISM_TYPE);
+		RETVAL = self->function_list->C_GetMechanismList(slotID,_pMechanismList,&pulCount);
+		if ( RETVAL == CKR_OK ) {
+			unsigned int i = 0;
+			for(i=0;i<pulCount;i++) {
+				av_push((AV*)pMechanismList,newSViv(_pMechanismList[i]));
+			}
+		}
+		Safefree(_pMechanismList);
+	}
+OUTPUT:
+	RETVAL
+	pMechanismList
+
+
+CK_RV
+C_GetMechanismInfo(self,slotID,type,pInfo)
+	Crypt::Cryptoki::Raw	self
+	CK_SLOT_ID						slotID
+	CK_MECHANISM_TYPE 		type
+	HV*										pInfo
+CODE:
+	CK_MECHANISM_INFO _pInfo;
+	RETVAL = self->function_list->C_GetMechanismInfo(slotID,type,&_pInfo);
+	if (RETVAL == CKR_OK) {
+		hv_store(pInfo, "ulMinKeySize", 12, newSVuv(_pInfo.ulMinKeySize), 0);
+		hv_store(pInfo, "ulMaxKeySize", 12, newSVuv(_pInfo.ulMaxKeySize), 0);
+		hv_store(pInfo, "flags", 5, newSViv(_pInfo.flags), 0);
+	}
+OUTPUT:
+	RETVAL
+	pInfo
+
+
+CK_RV
+C_InitToken(self,slotID,pPin,ulPinLen,pLabel)
+	Crypt::Cryptoki::Raw	self
+	CK_SLOT_ID						slotID
+	char*									pPin
+	CK_ULONG							ulPinLen
+	char*									pLabel
+CODE:
+	RETVAL = self->function_list->C_InitToken(slotID,(CK_UTF8CHAR_PTR)pPin,ulPinLen,(CK_UTF8CHAR_PTR)pLabel);
+OUTPUT:
+	RETVAL
+
+
+CK_RV
+C_InitPIN(self,hSession,pPin,ulPinLen)
+	Crypt::Cryptoki::Raw	self
+	CK_SESSION_HANDLE			hSession
+	char*									pPin
+	CK_ULONG							ulPinLen
+CODE:
+	RETVAL = self->function_list->C_InitPIN(hSession,(CK_UTF8CHAR_PTR)pPin,ulPinLen);
+OUTPUT:
+	RETVAL
+
+
+CK_RV
+C_SetPIN(self,hSession,pOldPin,ulOldLen,pNewPin,ulNewLen)
+	Crypt::Cryptoki::Raw	self
+	CK_SESSION_HANDLE			hSession
+	char*									pOldPin
+	CK_ULONG							ulOldLen
+	char*									pNewPin
+	CK_ULONG							ulNewLen
+CODE:
+	RETVAL = self->function_list->C_SetPIN(
+		hSession,
+		(CK_UTF8CHAR_PTR)pOldPin,ulOldLen,
+		(CK_UTF8CHAR_PTR)pNewPin,ulNewLen
+	);
+OUTPUT:
+	RETVAL
+
+	
 ################################################################################
 #
 # Session management functions

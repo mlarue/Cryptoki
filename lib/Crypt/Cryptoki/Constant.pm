@@ -16,6 +16,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
 	'helper' => [qw(
 		rv_to_str
+		ckm_to_str
 	)], 
 	'attributes' => [ qw(
 		CKA_AC_ISSUER
@@ -659,16 +660,50 @@ XSLoader::load('Crypt::Cryptoki::Constant');
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
-my %rv_map;
+my %constant_name_map;
 {
 	no strict 'refs';
-	%rv_map = map { $_->() => $_ } grep { /^CKR/ } @EXPORT_OK;
+	for ( @EXPORT_OK ) {
+		if ( /^([A-Z]{3})_.+/ ) {
+			$constant_name_map{$1}{$_->()} = $_;
+		}
+	}
 }
 
 sub rv_to_str {
 	my ( $err_num ) = @_;
-	return $rv_map{$err_num} || 'n/a ('.$err_num.')';
+	return $constant_name_map{CKR}{$err_num} || 'n/a ('.$err_num.')';
 }
+
+sub ckm_to_str {
+	my ( $err_num ) = @_;
+	return $constant_name_map{CKM}{$err_num} || 'n/a ('.$err_num.')';
+}
+
+=pod
+
+see t/token.t
+
+use Data::Dump;
+dd(\%constant_name_map);
+
+sub flags_to_str {
+	my ( $flags ) = @_;
+	my @res;
+	for ( sort { $a <=> $b } keys %{$constant_name_map{CKF}} ) {
+	#for ( @{$EXPORT_TAGS{flags}} ) {
+		#no strict 'refs';
+		#push @res, $_ if $flags & $_->();
+		
+		#print STDERR ckf_to_str($_), ' ', $_, "\n";
+		
+		push @res, $constant_name_map{CKF}{$_}
+			if $flags & $_;
+	}	
+	join('|', @res);
+}
+
+=cut
 
 1;
 __END__

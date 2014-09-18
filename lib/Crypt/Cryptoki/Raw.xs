@@ -397,6 +397,49 @@ OUTPUT:
 # Object management functions
 #
 
+// TODO: Test C_CreateObject / SoftHSM hassle?
+
+CK_RV
+C_CreateObject(self,hSession,pTemplate,phObject)
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pTemplate
+	CK_OBJECT_HANDLE      phObject
+CODE:
+	CK_ATTRIBUTE_PTR _pTemplate;
+	CK_ULONG ulCount = 0;
+
+	Newxz(_pTemplate, av_len(pTemplate)+1, CK_ATTRIBUTE);
+	int i = 0;
+	for(i=0;i<=av_len(pTemplate);++i){
+		SV** elem = av_fetch(pTemplate, i, 0);
+		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
+			croak("Error: wrong argument");
+		}
+		AV* attr = (AV*)SvRV(*elem);
+		if ( av_len(attr) != 1 ) { // 2
+			croak("Illegal array length in argument");
+		}
+
+		_pTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
+
+		SV* _value = *av_fetch(attr, 1, 0);
+		CK_ULONG _len = sv_len(_value);
+
+		_pTemplate[i].pValue = (void*)SvPV(_value, _len);
+		_pTemplate[i].ulValueLen = _len;
+
+		ulCount++;
+	}
+
+	RETVAL = self->function_list->C_CreateObject(hSession,_pTemplate,ulCount,&phObject);
+	
+	Safefree(_pTemplate);
+OUTPUT:
+	RETVAL
+	phObject
+
+
 CK_RV
 C_DestroyObject(self,hSession,hObject)
 	Crypt::Cryptoki::Raw	self
@@ -410,10 +453,10 @@ OUTPUT:
 
 CK_RV
 C_GetAttributeValue(self,hSession,hObject,pTemplate)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 					hSession
-	CK_OBJECT_HANDLE 					hObject
-	AV*				 					pTemplate
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	CK_OBJECT_HANDLE      hObject
+	AV*                   pTemplate
 CODE:
 	CK_ATTRIBUTE_PTR _pTemplate;
 	CK_ULONG ulCount = 0;
@@ -459,7 +502,6 @@ CODE:
 OUTPUT:
 	RETVAL
 
-# TODO: C_CreateObject
 # TODO: C_CopyObject
 # TODO: C_GetObjectSize
 # TODO: C_SetAttributeValue

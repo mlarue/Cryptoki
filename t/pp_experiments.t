@@ -1,5 +1,6 @@
 use Test::Most 'die';
 use Try::Tiny;
+use Scalar::Util qw(blessed);
 
 sub string_ref {
 	my ( $ref ) = @_;
@@ -66,10 +67,11 @@ package Fred {
 	hash_ref($ref);     
 	is_deeply($ref, { 'one' => 1 }, 'hash_ref 2');
 
-	$ref = Fred->new;
 	# by incident $ref is also a hash-ref
+	$ref = Fred->new;
 	hash_ref($ref);     
 	is_deeply($ref, { 'one' => 1 }, 'hash_ref 3');
+	is( blessed($ref), 'Fred', 'hash_ref 3 (still blessed)' );
 
 	my %hsh;
 	hash_ref(\%hsh);     

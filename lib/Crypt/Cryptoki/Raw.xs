@@ -566,12 +566,12 @@ OUTPUT:
 
 CK_RV
 C_Encrypt(self,hSession,pData,ulDataLen,pEncryptedData,ulEncryptedDataLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	char* 					pData
-	CK_ULONG				ulDataLen
-	SV* 					pEncryptedData
-	CK_ULONG				ulEncryptedDataLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pData
+	CK_ULONG              ulDataLen
+	SV*                   pEncryptedData
+	CK_ULONG              ulEncryptedDataLen
 CODE:
 	RETVAL = self->function_list->C_Encrypt(hSession,(CK_BYTE_PTR)pData,ulDataLen,
 		NULL_PTR,&ulEncryptedDataLen);
@@ -593,11 +593,11 @@ OUTPUT:
 
 CK_RV
 C_EncryptUpdate(self,hSession,pPart,ulPartLen,pEncryptedPart,ulEncryptedPartLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	char* 								pPart
-	CK_ULONG 							ulPartLen
-	SV*				 						pEncryptedPart
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pPart
+	CK_ULONG              ulPartLen
+	SV*                   pEncryptedPart
 	CK_ULONG 							ulEncryptedPartLen
 CODE:
 	CK_BYTE_PTR _pEncryptedPart;
@@ -618,10 +618,10 @@ OUTPUT:
 
 CK_RV
 C_EncryptFinal(self,hSession,pEncryptedPart,ulEncryptedPartLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	SV*				 						pEncryptedPart
-	CK_ULONG 							ulEncryptedPartLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	SV*                   pEncryptedPart
+	CK_ULONG              ulEncryptedPartLen
 CODE:
 	CK_BYTE_PTR _pEncryptedPart;
 	Newx(_pEncryptedPart,ulEncryptedPartLen,CK_BYTE);
@@ -646,10 +646,10 @@ OUTPUT:
 
 CK_RV
 C_DecryptInit(self,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	AV*				 		pMechanism
-	CK_OBJECT_HANDLE 		hKey
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+	CK_OBJECT_HANDLE      hKey
 CODE:
 	CK_MECHANISM	 		_pMechanism;
 	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
@@ -662,12 +662,12 @@ OUTPUT:
 
 CK_RV
 C_Decrypt(self,hSession,pEncryptedData,ulEncryptedDataLen,pData,ulDataLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	char* 					pEncryptedData
-	CK_ULONG				ulEncryptedDataLen
-	SV* 					pData
-	CK_ULONG				ulDataLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pEncryptedData
+	CK_ULONG              ulEncryptedDataLen
+	SV*                   pData
+	CK_ULONG              ulDataLen
 CODE:
 	RETVAL = self->function_list->C_Decrypt(hSession,(CK_BYTE_PTR)pEncryptedData,ulEncryptedDataLen,
 		NULL_PTR,&ulDataLen);
@@ -708,12 +708,12 @@ OUTPUT:
 
 CK_RV
 C_SignInit(self,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	AV*				 		pMechanism
-	CK_OBJECT_HANDLE 		hKey
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+	CK_OBJECT_HANDLE      hKey
 CODE:
-	CK_MECHANISM	 		_pMechanism;
+	CK_MECHANISM _pMechanism;
 	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
 	_pMechanism.pParameter = NULL_PTR;
 	_pMechanism.ulParameterLen = 0; 
@@ -724,12 +724,12 @@ OUTPUT:
 
 CK_RV
 C_Sign(self,hSession,pData,ulDataLen,pSignature,ulSignatureLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	char* 					pData
-	CK_ULONG				ulDataLen
-	SV* 					pSignature
-	CK_ULONG				ulSignatureLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pData
+	CK_ULONG              ulDataLen
+	SV*                   pSignature
+	CK_ULONG              ulSignatureLen
 CODE:
 	RETVAL = self->function_list->C_Sign(hSession,(CK_BYTE_PTR)pData,ulDataLen,
 		NULL_PTR,&ulSignatureLen);
@@ -760,12 +760,12 @@ OUTPUT:
 
 CK_RV
 C_VerifyInit(self,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	AV*				 		pMechanism
-	CK_OBJECT_HANDLE 		hKey
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+	CK_OBJECT_HANDLE      hKey
 CODE:
-	CK_MECHANISM	 		_pMechanism;
+	CK_MECHANISM _pMechanism;
 	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
 	_pMechanism.pParameter = NULL_PTR;
 	_pMechanism.ulParameterLen = 0; 
@@ -776,12 +776,12 @@ OUTPUT:
 
 CK_RV
 C_Verify(self,hSession,pData,ulDataLen,pSignature,ulSignatureLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	char* 					pData
-	CK_ULONG				ulDataLen
-	char* 					pSignature
-	CK_ULONG				ulSignatureLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pData
+	CK_ULONG              ulDataLen
+	char*                 pSignature
+	CK_ULONG              ulSignatureLen
 CODE:
 	RETVAL = self->function_list->C_Verify(hSession,(CK_BYTE_PTR)pData,ulDataLen,
 		(CK_BYTE_PTR)pSignature,ulSignatureLen);
@@ -863,10 +863,10 @@ OUTPUT:
 
 CK_RV
 C_SeedRandom(self,hSession,pSeed,ulSeedLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	char*									pSeed
-	CK_ULONG 							ulSeedLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pSeed
+	CK_ULONG              ulSeedLen
 CODE:
 	RETVAL = self->function_list->C_SeedRandom(hSession,(CK_BYTE_PTR)pSeed,ulSeedLen);
 OUTPUT:
@@ -875,10 +875,10 @@ OUTPUT:
 
 CK_RV
 C_GenerateRandom(self,hSession,pRandomData,ulRandomLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	SV*										pRandomData
-	CK_ULONG 							ulRandomLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	SV*                   pRandomData
+	CK_ULONG              ulRandomLen
 CODE:
 	CK_BYTE_PTR _pRandomData;
 	Newx(_pRandomData,ulRandomLen,CK_BYTE);
@@ -897,8 +897,8 @@ OUTPUT:
 
 CK_RV
 C_GetFunctionStatus(self,hSession)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
 CODE:
 	RETVAL = self->function_list->C_GetFunctionStatus(hSession);
 	// RETVAL = CKR_FUNCTION_NOT_PARALLEL;
@@ -908,8 +908,8 @@ OUTPUT:
 	
 CK_RV
 C_CancelFunction(self,hSession)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
 CODE:
 	RETVAL = self->function_list->C_CancelFunction(hSession);
 	// RETVAL = CKR_FUNCTION_NOT_PARALLEL;

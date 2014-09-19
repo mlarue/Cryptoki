@@ -695,8 +695,48 @@ OUTPUT:
 # Message digesting functions
 #
 
-# TODO: C_DigestInit
-# TODO: C_Digest
+CK_RV
+C_DigestInit(self,hSession,pMechanism)
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+CODE:
+	CK_MECHANISM _pMechanism;
+	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
+	_pMechanism.pParameter = NULL_PTR;
+	_pMechanism.ulParameterLen = 0; 
+	RETVAL = self->function_list->C_DigestInit(hSession,&_pMechanism);
+OUTPUT:
+	RETVAL
+
+
+CK_RV
+C_Digest(self,hSession,pData,ulDataLen,pDigest,ulDigestLen)
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pData
+	CK_ULONG              ulDataLen
+	SV*                   pDigest
+	CK_ULONG              ulDigestLen
+CODE:
+	RETVAL = self->function_list->C_Digest(hSession,(CK_BYTE_PTR)pData,ulDataLen,
+		NULL_PTR,&ulDigestLen);
+	if ( RETVAL==CKR_OK ) {
+		CK_BYTE_PTR _pDigest;
+		Newx(_pDigest,ulDigestLen,CK_BYTE);
+		RETVAL = self->function_list->C_Digest(hSession,(CK_BYTE_PTR)pData,ulDataLen,
+			_pDigest,&ulDigestLen);
+
+		if ( RETVAL==CKR_OK ) {
+			*pDigest = *newSVpv((char*)_pDigest, ulDigestLen);
+		}
+	}
+OUTPUT:
+	RETVAL
+	pDigest
+	ulDigestLen
+
+
 # TODO: C_DigestUpdate
 # TODO: C_DigestKey
 # TODO: C_DigestFinal
@@ -850,8 +890,84 @@ OUTPUT:
 	phPrivateKey
 
 
-# TODO: C_GenerateKey
-# TODO: C_WrapKey
+CK_RV
+C_GenerateKey(self,hSession,pMechanism, \
+	pTemplate, phKey)
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+	CK_ATTRIBUTE_PTR      pTemplate
+	CK_OBJECT_HANDLE      phKey
+PREINIT:
+	CK_ULONG pTemplate_count;
+CODE:
+	CK_MECHANISM	 		_pMechanism;
+
+	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
+	_pMechanism.pParameter = NULL_PTR;
+	_pMechanism.ulParameterLen = 0; 
+
+	RETVAL = self->function_list->C_GenerateKey(
+		hSession,
+		&_pMechanism,
+		pTemplate,
+		pTemplate_count,
+		&phKey
+	);
+
+	Safefree(pTemplate);
+OUTPUT:
+	RETVAL
+	phKey
+
+
+CK_RV
+C_WrapKey(self,hSession,pMechanism, \
+	hWrappingKey, hKey, pWrappedKey, ulWrappedKeyLen)
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+	CK_OBJECT_HANDLE      hWrappingKey
+	CK_OBJECT_HANDLE      hKey
+	SV*                   pWrappedKey
+	CK_ULONG              ulWrappedKeyLen
+CODE:
+	CK_MECHANISM _pMechanism;
+
+	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
+	_pMechanism.pParameter = NULL_PTR;
+	_pMechanism.ulParameterLen = 0; 
+
+	RETVAL = self->function_list->C_WrapKey(
+		hSession,
+		&_pMechanism,
+		hWrappingKey,
+		hKey,
+		NULL_PTR,
+		&ulWrappedKeyLen
+	);
+
+	if ( RETVAL==CKR_OK ) {
+		CK_BYTE_PTR _pWrappedKey;
+		Newx(_pWrappedKey,ulWrappedKeyLen,CK_BYTE);
+		RETVAL = self->function_list->C_WrapKey(
+			hSession,
+			&_pMechanism,
+			hWrappingKey,
+			hKey,
+			_pWrappedKey,
+			&ulWrappedKeyLen
+		);
+		
+		if ( RETVAL==CKR_OK ) {
+			*pWrappedKey = *newSVpv((char*)_pWrappedKey, ulWrappedKeyLen);
+		}
+	}
+OUTPUT:
+	RETVAL
+	pWrappedKey
+	ulWrappedKeyLen
+
 # TODO: C_UnwrapKey
 # TODO: C_DeriveKey
 

@@ -163,8 +163,8 @@ is rv_to_str($f->C_Verify(
 
 
 my $get_attributes_template = [
-    [ CKA_MODULUS, '' ],
-    [ CKA_PUBLIC_EXPONENT, '' ],
+    [ CKA_MODULUS ],
+    [ CKA_PUBLIC_EXPONENT ],
 ];
 
 is rv_to_str($f->C_GetAttributeValue(

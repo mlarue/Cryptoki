@@ -23,6 +23,75 @@ MODULE = Crypt::Cryptoki::Raw										PACKAGE = Crypt::Cryptoki::Raw
 
 PROTOTYPES: ENABLE
 
+TYPEMAP: <<HERE
+
+TYPEMAP
+CK_ATTRIBUTE_PTR  T_TEMPLATE
+
+INPUT
+T_TEMPLATE
+	STMT_START {
+		SV* const xsub_tmp_sv = $arg;
+		if (SvROK(xsub_tmp_sv) && SvTYPE(SvRV(xsub_tmp_sv)) == SVt_PVAV){
+			AV* aTemplate = (AV*)SvRV(xsub_tmp_sv);
+			$var\_count = av_top_index(aTemplate)+1;
+			Newxz($var, $var\_count, CK_ATTRIBUTE);
+			int i = 0;
+			for(i=0;i<$var\_count;++i){
+				SV** elem = av_fetch(aTemplate, i, 0);
+				if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
+					croak(\"Error: wrong argument\");
+				}
+				AV* attr = (AV*)SvRV(*elem);
+				size_t attr_count = av_top_index(attr) + 1;
+
+				if ( attr_count > 0 ) {
+					$var\[i\].type = SvUV(*av_fetch(attr, 0, 0));
+				}
+
+				if ( attr_count == 1 ) {
+					$var\[i\].pValue = NULL;
+					$var\[i\].ulValueLen = 0;
+				}
+				else if ( attr_count == 2 ) {
+					// TODO: special case: pValue is array of attributes
+					SV* _value = *av_fetch(attr, 1, 0);
+					CK_ULONG _len = sv_len(_value);
+					$var\[i\].pValue = (void*)SvPV(_value, _len);
+					$var\[i\].ulValueLen = _len;
+				}
+				else {
+					croak(\"Illegal array length in argument\");
+				}
+			}
+		}
+		else {
+			Perl_croak(aTHX_ \"%s: %s is not an ARRAY reference\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\");
+		}
+	} STMT_END
+
+OUTPUT
+T_TEMPLATE
+	{
+		if ( RETVAL == CKR_OK ) {
+			SV* const xsub_tmp_sv = $arg;
+			AV* aTemplate = (AV*)SvRV(xsub_tmp_sv);
+			int i;
+			for(i=0;i<$var\_count;++i){
+				AV* attr = (AV*)SvRV(*av_fetch(aTemplate, i, 0));
+				av_store(attr, 1, newSVpv($var\[i\].pValue, $var\[i\].ulValueLen));
+			}
+		}
+		Safefree($var);
+	}
+
+HERE
+
+
+
+
 
 Crypt::Cryptoki::Raw
 new( const char *class, const char *library_path )
@@ -397,44 +466,24 @@ OUTPUT:
 # Object management functions
 #
 
-// TODO: Test C_CreateObject / SoftHSM hassle?
+# TODO: Test C_CreateObject / SoftHSM hassle?
 
 CK_RV
 C_CreateObject(self,hSession,pTemplate,phObject)
 	Crypt::Cryptoki::Raw  self
 	CK_SESSION_HANDLE     hSession
-	AV*                   pTemplate
+	CK_ATTRIBUTE_PTR      pTemplate
 	CK_OBJECT_HANDLE      phObject
+PREINIT:
+	CK_ULONG pTemplate_count;
 CODE:
-	CK_ATTRIBUTE_PTR _pTemplate;
-	CK_ULONG ulCount = 0;
-
-	Newxz(_pTemplate, av_len(pTemplate)+1, CK_ATTRIBUTE);
-	int i = 0;
-	for(i=0;i<=av_len(pTemplate);++i){
-		SV** elem = av_fetch(pTemplate, i, 0);
-		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
-			croak("Error: wrong argument");
-		}
-		AV* attr = (AV*)SvRV(*elem);
-		if ( av_len(attr) != 1 ) { // 2
-			croak("Illegal array length in argument");
-		}
-
-		_pTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
-
-		SV* _value = *av_fetch(attr, 1, 0);
-		CK_ULONG _len = sv_len(_value);
-
-		_pTemplate[i].pValue = (void*)SvPV(_value, _len);
-		_pTemplate[i].ulValueLen = _len;
-
-		ulCount++;
-	}
-
-	RETVAL = self->function_list->C_CreateObject(hSession,_pTemplate,ulCount,&phObject);
-	
-	Safefree(_pTemplate);
+	RETVAL = self->function_list->C_CreateObject(
+		hSession,
+		pTemplate,
+		pTemplate_count,
+		&phObject
+	);
+	Safefree(pTemplate);
 OUTPUT:
 	RETVAL
 	phObject
@@ -456,51 +505,35 @@ C_GetAttributeValue(self,hSession,hObject,pTemplate)
 	Crypt::Cryptoki::Raw  self
 	CK_SESSION_HANDLE     hSession
 	CK_OBJECT_HANDLE      hObject
-	AV*                   pTemplate
+	CK_ATTRIBUTE_PTR      pTemplate
+PREINIT:
+	CK_ULONG pTemplate_count;
 CODE:
-	CK_ATTRIBUTE_PTR _pTemplate;
-	CK_ULONG ulCount = 0;
-	Newxz(_pTemplate, av_len(pTemplate)+1, CK_ATTRIBUTE);
+	RETVAL = self->function_list->C_GetAttributeValue(
+		hSession,
+		hObject,
+		pTemplate,
+		pTemplate_count
+	);
 
-	int i = 0;
-	for(i=0;i<=av_len(pTemplate);++i){
-		SV** elem = av_fetch(pTemplate, i, 0);
-		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
-			croak("Error: wrong argument");
-		}
-		AV* attr = (AV*)SvRV(*elem);
-		if ( av_len(attr) != 1 ) { // 2
-			croak("Illegal array length in argument");
-		}
-		_pTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
-		
-		// TODO: special case: pValue is array of attributes
-
-		_pTemplate[i].pValue = NULL;
-		_pTemplate[i].ulValueLen = 0;
-		ulCount++;
-	}
-
-	RETVAL = self->function_list->C_GetAttributeValue(hSession,hObject,_pTemplate,ulCount);
 	if ( RETVAL == CKR_OK ) {
-		for(i=0;i<ulCount;++i){
-			// printf("len: %lu\n", _pTemplate[i].ulValueLen);
-			if ( _pTemplate[i].ulValueLen == -1 ) {
+		int i = 0;
+		for(i=0;i<pTemplate_count;++i){
+			if ( pTemplate[i].ulValueLen == -1 ) {
 				croak("Error: attribute %d",i);
 			}
-			Newx(_pTemplate[i].pValue,_pTemplate[i].ulValueLen,CK_BYTE);
+			Newx(pTemplate[i].pValue,pTemplate[i].ulValueLen,CK_BYTE);
 		}
-
-		RETVAL = self->function_list->C_GetAttributeValue(hSession,hObject,_pTemplate,ulCount);
-		if ( RETVAL == CKR_OK ) {
-			for(i=0;i<ulCount;++i){
-				AV* attr = (AV*)SvRV(*av_fetch(pTemplate, i, 0));
-				av_store(attr, 1, newSVpv(_pTemplate[i].pValue, _pTemplate[i].ulValueLen));
-			}
-		}
+		RETVAL = self->function_list->C_GetAttributeValue(
+			hSession,
+			hObject,
+			pTemplate,
+			pTemplate_count
+		);
 	}
 OUTPUT:
 	RETVAL
+	pTemplate
 
 # TODO: C_CopyObject
 # TODO: C_GetObjectSize
@@ -781,76 +814,36 @@ C_GenerateKeyPair(self,hSession,pMechanism, \
 	pPublicKeyTemplate, \
 	pPrivateKeyTemplate, \
 	phPublicKey,phPrivateKey)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	AV*				 		pMechanism
-	AV* 					pPublicKeyTemplate
-	AV* 					pPrivateKeyTemplate
-	CK_OBJECT_HANDLE	 	phPublicKey
-	CK_OBJECT_HANDLE		phPrivateKey
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+	CK_ATTRIBUTE_PTR      pPublicKeyTemplate
+	CK_ATTRIBUTE_PTR      pPrivateKeyTemplate
+	CK_OBJECT_HANDLE      phPublicKey
+	CK_OBJECT_HANDLE      phPrivateKey
+PREINIT:
+	CK_ULONG pPublicKeyTemplate_count;
+	CK_ULONG pPrivateKeyTemplate_count;
 CODE:
 	CK_MECHANISM	 		_pMechanism;
-	CK_ATTRIBUTE_PTR 		_pPublicKeyTemplate;
-	CK_ULONG 				ulPublicKeyAttributeCount = 0;
-	CK_ATTRIBUTE_PTR 		_pPrivateKeyTemplate;
-	CK_ULONG 				ulPrivateKeyAttributeCount = 0;
 
 	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
 	_pMechanism.pParameter = NULL_PTR;
 	_pMechanism.ulParameterLen = 0; 
 
-	Newxz(_pPublicKeyTemplate, av_len(pPublicKeyTemplate)+1, CK_ATTRIBUTE);
-	int i = 0;
-	for(i=0;i<=av_len(pPublicKeyTemplate);++i){
-		SV** elem = av_fetch(pPublicKeyTemplate, i, 0);
-		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
-			croak("Error: wrong argument");
-		}
-		AV* attr = (AV*)SvRV(*elem);
-		if ( av_len(attr) != 1 ) { // 2
-			croak("Illegal array length in argument");
-		}
+	RETVAL = self->function_list->C_GenerateKeyPair(
+		hSession,
+		&_pMechanism,
+		pPublicKeyTemplate,
+		pPublicKeyTemplate_count,
+		pPrivateKeyTemplate,
+		pPrivateKeyTemplate_count,
+		&phPublicKey,
+		&phPrivateKey
+	);
 
-		_pPublicKeyTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
-
-		SV* _value = *av_fetch(attr, 1, 0);
-		CK_ULONG _len = sv_len(_value);
-
-		_pPublicKeyTemplate[i].pValue = (void*)SvPV(_value, _len);
-		_pPublicKeyTemplate[i].ulValueLen = _len;
-
-		ulPublicKeyAttributeCount++;
-	}
-
-	Newxz(_pPrivateKeyTemplate, av_len(pPrivateKeyTemplate)+1, CK_ATTRIBUTE);
-	for(i=0;i<=av_len(pPrivateKeyTemplate);++i){
-		SV** elem = av_fetch(pPrivateKeyTemplate, i, 0);
-		if ( elem == NULL || SvTYPE(SvRV(*elem)) != SVt_PVAV ) {
-			croak("Error: wrong argument");
-		}
-		AV* attr = (AV*)SvRV(*elem);
-		if ( av_len(attr) != 1 ) { // 2
-			croak("Illegal array length in argument");
-		}
-
-		_pPrivateKeyTemplate[i].type = SvUV(*av_fetch(attr, 0, 0));
-
-		SV* _value = *av_fetch(attr, 1, 0);
-		CK_ULONG _len = sv_len(_value);
-
-		_pPrivateKeyTemplate[i].pValue = (void*)SvPV(_value, _len);
-		_pPrivateKeyTemplate[i].ulValueLen = _len;
-
-		ulPrivateKeyAttributeCount++;
-	}
-
-	RETVAL = self->function_list->C_GenerateKeyPair(hSession,&_pMechanism,
-		_pPublicKeyTemplate,ulPublicKeyAttributeCount,
-		_pPrivateKeyTemplate,ulPrivateKeyAttributeCount,
-		&phPublicKey,&phPrivateKey);
-
-	Safefree(_pPublicKeyTemplate);
-	Safefree(_pPrivateKeyTemplate);
+	Safefree(pPublicKeyTemplate);
+	Safefree(pPrivateKeyTemplate);
 OUTPUT:
 	RETVAL
 	phPublicKey

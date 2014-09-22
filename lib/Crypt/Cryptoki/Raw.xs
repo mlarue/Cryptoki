@@ -7,8 +7,8 @@
 #include "cryptoki/cryptoki.h"
 
 typedef struct raw {
-	void*	handle;
-	CK_FUNCTION_LIST*	function_list;
+	void*             handle;
+	CK_FUNCTION_LIST* function_list;
 } raw_t;
 
 typedef raw_t* Crypt__Cryptoki__Raw;
@@ -19,7 +19,7 @@ CK_RV notify_callback(CK_SESSION_HANDLE hSession, CK_NOTIFICATION event,CK_VOID_
 }
 
 
-MODULE = Crypt::Cryptoki::Raw										PACKAGE = Crypt::Cryptoki::Raw		
+MODULE = Crypt::Cryptoki::Raw                    PACKAGE = Crypt::Cryptoki::Raw
 
 PROTOTYPES: ENABLE
 
@@ -124,7 +124,7 @@ OUTPUT:
 
 void
 DESTROY(self)
-	Crypt::Cryptoki::Raw	self
+	Crypt::Cryptoki::Raw  self
 CODE:
 	if (dlclose(self->handle)) {
 		warn("dlclose problem");
@@ -138,7 +138,7 @@ CODE:
 
 CK_RV
 C_Initialize(self)
-	Crypt::Cryptoki::Raw	self
+	Crypt::Cryptoki::Raw  self
 CODE:
 	RETVAL = self->function_list->C_Initialize(NULL);
 OUTPUT:
@@ -147,7 +147,7 @@ OUTPUT:
 
 CK_RV
 C_Finalize(self)
-	Crypt::Cryptoki::Raw	self
+	Crypt::Cryptoki::Raw  self
 CODE:
 	RETVAL = self->function_list->C_Finalize(NULL);
 OUTPUT:
@@ -156,8 +156,8 @@ OUTPUT:
 
 CK_RV
 C_GetInfo(self,info)
-	Crypt::Cryptoki::Raw	self
-	HV*						info
+	Crypt::Cryptoki::Raw  self
+	HV*                   info
 CODE:
 	CK_INFO _info;
 	RETVAL = self->function_list->C_GetInfo(&_info);
@@ -182,9 +182,9 @@ OUTPUT:
 
 CK_RV
 C_GetSlotList(self,tokenPresent,pSlotList)
-	Crypt::Cryptoki::Raw	self
-	CK_BBOOL 				tokenPresent
-	AV*			 			pSlotList
+	Crypt::Cryptoki::Raw  self
+	CK_BBOOL              tokenPresent
+	AV*                   pSlotList
 CODE:
 	CK_ULONG pulCount;
 
@@ -212,9 +212,9 @@ OUTPUT:
 
 CK_RV
 C_GetSlotInfo(self,slotID,pInfo)
-	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID				slotID
-	HV*						pInfo
+	Crypt::Cryptoki::Raw  self
+	CK_SLOT_ID            slotID
+	HV*                   pInfo
 CODE:
 	CK_SLOT_INFO _pInfo;
 	RETVAL = self->function_list->C_GetSlotInfo(slotID,&_pInfo);
@@ -234,9 +234,9 @@ OUTPUT:
 
 CK_RV
 C_GetTokenInfo(self,slotID,pInfo)
-	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID						slotID
-	HV*										pInfo
+	Crypt::Cryptoki::Raw  self
+	CK_SLOT_ID            slotID
+	HV*                   pInfo
 CODE:
 	CK_TOKEN_INFO _pInfo;
 	RETVAL = self->function_list->C_GetTokenInfo(slotID,&_pInfo);
@@ -269,9 +269,9 @@ OUTPUT:
 
 CK_RV
 C_WaitForSlotEvent(self,flags,pSlot)
-	Crypt::Cryptoki::Raw	self
-	CK_FLAGS 							flags
-	SV*										pSlot
+	Crypt::Cryptoki::Raw  self
+	CK_FLAGS              flags
+	SV*                   pSlot
 CODE:
 	CK_SLOT_ID _slotID;
 	RETVAL = self->function_list->C_WaitForSlotEvent(flags,&_slotID,NULL_PTR);
@@ -285,9 +285,9 @@ OUTPUT:
 
 CK_RV
 C_GetMechanismList(self,slotID,pMechanismList)
-	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID						slotID
-	AV*										pMechanismList
+	Crypt::Cryptoki::Raw  self
+	CK_SLOT_ID            slotID
+	AV*                   pMechanismList
 CODE:
 	CK_ULONG pulCount;
 	RETVAL = self->function_list->C_GetMechanismList(slotID,NULL_PTR,&pulCount);
@@ -310,10 +310,10 @@ OUTPUT:
 
 CK_RV
 C_GetMechanismInfo(self,slotID,type,pInfo)
-	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID						slotID
-	CK_MECHANISM_TYPE 		type
-	HV*										pInfo
+	Crypt::Cryptoki::Raw  self
+	CK_SLOT_ID            slotID
+	CK_MECHANISM_TYPE     type
+	HV*                   pInfo
 CODE:
 	CK_MECHANISM_INFO _pInfo;
 	RETVAL = self->function_list->C_GetMechanismInfo(slotID,type,&_pInfo);
@@ -329,11 +329,11 @@ OUTPUT:
 
 CK_RV
 C_InitToken(self,slotID,pPin,ulPinLen,pLabel)
-	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID						slotID
-	char*									pPin
-	CK_ULONG							ulPinLen
-	char*									pLabel
+	Crypt::Cryptoki::Raw  self
+	CK_SLOT_ID            slotID
+	char*                 pPin
+	CK_ULONG              ulPinLen
+	char*                 pLabel
 CODE:
 	RETVAL = self->function_list->C_InitToken(slotID,(CK_UTF8CHAR_PTR)pPin,ulPinLen,(CK_UTF8CHAR_PTR)pLabel);
 OUTPUT:
@@ -342,10 +342,10 @@ OUTPUT:
 
 CK_RV
 C_InitPIN(self,hSession,pPin,ulPinLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE			hSession
-	char*									pPin
-	CK_ULONG							ulPinLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pPin
+	CK_ULONG              ulPinLen
 CODE:
 	RETVAL = self->function_list->C_InitPIN(hSession,(CK_UTF8CHAR_PTR)pPin,ulPinLen);
 OUTPUT:
@@ -354,12 +354,12 @@ OUTPUT:
 
 CK_RV
 C_SetPIN(self,hSession,pOldPin,ulOldLen,pNewPin,ulNewLen)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE			hSession
-	char*									pOldPin
-	CK_ULONG							ulOldLen
-	char*									pNewPin
-	CK_ULONG							ulNewLen
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	char*                 pOldPin
+	CK_ULONG              ulOldLen
+	char*                 pNewPin
+	CK_ULONG              ulNewLen
 CODE:
 	RETVAL = self->function_list->C_SetPIN(
 		hSession,
@@ -377,12 +377,12 @@ OUTPUT:
 
 CK_RV
 C_OpenSession(self,slotID,flags,phSession)
-	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID 						slotID
-	CK_FLAGS 							flags
-//	CK_VOID_PTR 				pApplication 
-//	CK_NOTIFY 					Notify
-	SV*										phSession
+	Crypt::Cryptoki::Raw  self
+	CK_SLOT_ID            slotID
+	CK_FLAGS              flags
+//  CK_VOID_PTR         pApplication
+//  CK_NOTIFY           Notify
+	SV*                   phSession
 CODE:
 	// TODO: pass perl callback to wrapper and call it there
 	CK_NOTIFY Notify = &notify_callback;
@@ -398,8 +398,8 @@ OUTPUT:
 
 CK_RV
 C_CloseSession(self,hSession)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
 CODE:
 	RETVAL = self->function_list->C_CloseSession(hSession);
 OUTPUT:
@@ -408,8 +408,8 @@ OUTPUT:
 
 CK_RV
 C_CloseAllSessions(self,slotID)
-	Crypt::Cryptoki::Raw	self
-	CK_SLOT_ID						slotID
+	Crypt::Cryptoki::Raw  self
+	CK_SLOT_ID            slotID
 CODE:
 	RETVAL = self->function_list->C_CloseAllSessions(slotID);
 OUTPUT:
@@ -418,9 +418,9 @@ OUTPUT:
 
 CK_RV
 C_GetSessionInfo(self,hSession,pInfo)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	HV* 					pInfo
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	HV*                   pInfo
 CODE:
 	CK_SESSION_INFO _pInfo;
 	RETVAL = self->function_list->C_GetSessionInfo(hSession,&_pInfo);
@@ -437,10 +437,10 @@ OUTPUT:
 
 CK_RV
 C_Login(self,hSession,userType,pPin)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	CK_USER_TYPE 			userType
-	CK_UTF8CHAR_PTR	 		pPin
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	CK_USER_TYPE          userType
+	CK_UTF8CHAR_PTR       pPin
 CODE:
 	CK_ULONG ulPinLen = strlen((const char *)pPin);
 	RETVAL = self->function_list->C_Login(hSession,userType,pPin,ulPinLen);
@@ -450,8 +450,8 @@ OUTPUT:
 
 CK_RV
 C_Logout(self,hSession)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
 CODE:
 	RETVAL = self->function_list->C_Logout(hSession);
 OUTPUT:
@@ -491,9 +491,9 @@ OUTPUT:
 
 CK_RV
 C_DestroyObject(self,hSession,hObject)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	CK_OBJECT_HANDLE 		hObject
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	CK_OBJECT_HANDLE      hObject
 CODE:
 	RETVAL = self->function_list->C_DestroyObject(hSession,hObject);
 OUTPUT:
@@ -550,12 +550,12 @@ OUTPUT:
 
 CK_RV
 C_EncryptInit(self,hSession,pMechanism,hKey)
-	Crypt::Cryptoki::Raw	self
-	CK_SESSION_HANDLE 		hSession
-	AV*				 		pMechanism
-	CK_OBJECT_HANDLE 		hKey
+	Crypt::Cryptoki::Raw  self
+	CK_SESSION_HANDLE     hSession
+	AV*                   pMechanism
+	CK_OBJECT_HANDLE      hKey
 CODE:
-	CK_MECHANISM	 		_pMechanism;
+	CK_MECHANISM _pMechanism;
 	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
 	_pMechanism.pParameter = NULL_PTR;
 	_pMechanism.ulParameterLen = 0; 
@@ -598,7 +598,7 @@ C_EncryptUpdate(self,hSession,pPart,ulPartLen,pEncryptedPart,ulEncryptedPartLen)
 	char*                 pPart
 	CK_ULONG              ulPartLen
 	SV*                   pEncryptedPart
-	CK_ULONG 							ulEncryptedPartLen
+	CK_ULONG              ulEncryptedPartLen
 CODE:
 	CK_BYTE_PTR _pEncryptedPart;
 	Newx(_pEncryptedPart,ulEncryptedPartLen,CK_BYTE);
@@ -865,7 +865,7 @@ PREINIT:
 	CK_ULONG pPublicKeyTemplate_count;
 	CK_ULONG pPrivateKeyTemplate_count;
 CODE:
-	CK_MECHANISM	 		_pMechanism;
+	CK_MECHANISM _pMechanism;
 
 	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
 	_pMechanism.pParameter = NULL_PTR;
@@ -901,7 +901,7 @@ C_GenerateKey(self,hSession,pMechanism, \
 PREINIT:
 	CK_ULONG pTemplate_count;
 CODE:
-	CK_MECHANISM	 		_pMechanism;
+	CK_MECHANISM _pMechanism;
 
 	_pMechanism.mechanism = SvUV(*av_fetch(pMechanism, 0, 0));
 	_pMechanism.pParameter = NULL_PTR;
@@ -1031,5 +1031,3 @@ CODE:
 	// RETVAL = CKR_FUNCTION_NOT_PARALLEL;
 OUTPUT:
 	RETVAL
-
-	

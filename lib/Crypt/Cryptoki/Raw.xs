@@ -13,6 +13,10 @@ typedef struct raw {
 
 typedef raw_t* Crypt__Cryptoki__Raw;
 
+typedef SV* SVREF;
+typedef AV* AVREF;
+typedef HV* HVREF;
+
 CK_RV notify_callback(CK_SESSION_HANDLE hSession, CK_NOTIFICATION event,CK_VOID_PTR pApplication) {
 	warn("notify\n");
 	return CKR_OK;
@@ -157,7 +161,7 @@ OUTPUT:
 CK_RV
 C_GetInfo(self,info)
 	Crypt::Cryptoki::Raw  self
-	HV*                   info
+	HVREF                 info
 CODE:
 	CK_INFO _info;
 	RETVAL = self->function_list->C_GetInfo(&_info);
@@ -184,7 +188,7 @@ CK_RV
 C_GetSlotList(self,tokenPresent,pSlotList)
 	Crypt::Cryptoki::Raw  self
 	CK_BBOOL              tokenPresent
-	AV*                   pSlotList
+	AVREF                 pSlotList
 CODE:
 	CK_ULONG pulCount;
 
@@ -199,7 +203,7 @@ CODE:
 		if ( RETVAL == CKR_OK ) {
 			unsigned int i = 0;
 			for(i=0;i<pulCount;i++) {
-				av_push((AV*)pSlotList,newSViv(_pSlotList[i]));
+				av_push(pSlotList,newSViv(_pSlotList[i]));
 			}
 		}
 
@@ -214,7 +218,7 @@ CK_RV
 C_GetSlotInfo(self,slotID,pInfo)
 	Crypt::Cryptoki::Raw  self
 	CK_SLOT_ID            slotID
-	HV*                   pInfo
+	HVREF                 pInfo
 CODE:
 	CK_SLOT_INFO _pInfo;
 	RETVAL = self->function_list->C_GetSlotInfo(slotID,&_pInfo);
@@ -226,7 +230,7 @@ CODE:
 			newSVpvf("%d.%d",_pInfo.hardwareVersion.major,_pInfo.hardwareVersion.minor), 0);
 		hv_store(pInfo, "firmwareVersion", 15, 
 			newSVpvf("%d.%d",_pInfo.firmwareVersion.major,_pInfo.firmwareVersion.minor), 0);
-	}	
+	}
 OUTPUT:
 	RETVAL
 	pInfo
@@ -236,7 +240,7 @@ CK_RV
 C_GetTokenInfo(self,slotID,pInfo)
 	Crypt::Cryptoki::Raw  self
 	CK_SLOT_ID            slotID
-	HV*                   pInfo
+	HVREF                 pInfo
 CODE:
 	CK_TOKEN_INFO _pInfo;
 	RETVAL = self->function_list->C_GetTokenInfo(slotID,&_pInfo);
@@ -261,7 +265,7 @@ CODE:
 		hv_store(pInfo, "firmwareVersion", 15, 
 			newSVpvf("%d.%d",_pInfo.firmwareVersion.major,_pInfo.firmwareVersion.minor), 0);
 		hv_store(pInfo, "utcTime", 7, newSVpv((char*)_pInfo.utcTime,16), 0);
-	}	
+	}
 OUTPUT:
 	RETVAL
 	pInfo
@@ -271,12 +275,12 @@ CK_RV
 C_WaitForSlotEvent(self,flags,pSlot)
 	Crypt::Cryptoki::Raw  self
 	CK_FLAGS              flags
-	SV*                   pSlot
+	SVREF                 pSlot
 CODE:
 	CK_SLOT_ID _slotID;
 	RETVAL = self->function_list->C_WaitForSlotEvent(flags,&_slotID,NULL_PTR);
 	if ( RETVAL==CKR_OK ) {
-		*pSlot = *newSViv(_slotID);
+		sv_setiv(pSlot, _slotID);
 	}
 OUTPUT:
 	RETVAL
@@ -287,7 +291,7 @@ CK_RV
 C_GetMechanismList(self,slotID,pMechanismList)
 	Crypt::Cryptoki::Raw  self
 	CK_SLOT_ID            slotID
-	AV*                   pMechanismList
+	AVREF                 pMechanismList
 CODE:
 	CK_ULONG pulCount;
 	RETVAL = self->function_list->C_GetMechanismList(slotID,NULL_PTR,&pulCount);
@@ -298,7 +302,7 @@ CODE:
 		if ( RETVAL == CKR_OK ) {
 			unsigned int i = 0;
 			for(i=0;i<pulCount;i++) {
-				av_push((AV*)pMechanismList,newSViv(_pMechanismList[i]));
+				av_push(pMechanismList,newSViv(_pMechanismList[i]));
 			}
 		}
 		Safefree(_pMechanismList);
@@ -313,7 +317,7 @@ C_GetMechanismInfo(self,slotID,type,pInfo)
 	Crypt::Cryptoki::Raw  self
 	CK_SLOT_ID            slotID
 	CK_MECHANISM_TYPE     type
-	HV*                   pInfo
+	HVREF                 pInfo
 CODE:
 	CK_MECHANISM_INFO _pInfo;
 	RETVAL = self->function_list->C_GetMechanismInfo(slotID,type,&_pInfo);
@@ -380,16 +384,17 @@ C_OpenSession(self,slotID,flags,phSession)
 	Crypt::Cryptoki::Raw  self
 	CK_SLOT_ID            slotID
 	CK_FLAGS              flags
-//  CK_VOID_PTR         pApplication
-//  CK_NOTIFY           Notify
-	SV*                   phSession
+# CK_VOID_PTR           pApplication
+# CK_NOTIFY             Notify
+#	CK_SESSION_HANDLE_PTR phSession
+	SVREF                 phSession
 CODE:
 	// TODO: pass perl callback to wrapper and call it there
 	CK_NOTIFY Notify = &notify_callback;
 	CK_SESSION_HANDLE _hSession;
 	RETVAL = self->function_list->C_OpenSession(slotID,flags,NULL_PTR,Notify,&_hSession);
 	if ( RETVAL==CKR_OK ) {
-		*phSession = *newSViv(_hSession);
+		sv_setiv(phSession, _hSession);
 	}
 OUTPUT:
 	RETVAL
@@ -420,7 +425,7 @@ CK_RV
 C_GetSessionInfo(self,hSession,pInfo)
 	Crypt::Cryptoki::Raw  self
 	CK_SESSION_HANDLE     hSession
-	HV*                   pInfo
+	HVREF                 pInfo
 CODE:
 	CK_SESSION_INFO _pInfo;
 	RETVAL = self->function_list->C_GetSessionInfo(hSession,&_pInfo);

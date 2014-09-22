@@ -7,7 +7,7 @@ my $build = Module::Build->new(
 	module_name => 'Crypt::Cryptoki',
 	license => 'perl',
 	requires => {
-		'perl' => '5.14.0',
+		'perl' => '5.15.4',
 	},
 	configure_requires => { 
 		'Module::Build' => 0 

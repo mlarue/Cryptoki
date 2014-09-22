@@ -29,8 +29,8 @@ for my $id ( @$slots ) {
 	diag explain $tokenInfo;
 }
 
-my $session = -1;
-is rv_to_str($f->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,$session)), 'CKR_OK', 'C_OpenSession';
+my $session;
+is rv_to_str($f->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,\$session)), 'CKR_OK', 'C_OpenSession';
 diag $session;
 
 my $sessionInfo = {};

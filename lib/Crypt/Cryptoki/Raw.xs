@@ -332,43 +332,39 @@ OUTPUT:
 
 
 CK_RV
-C_InitToken(self,slotID,pPin,ulPinLen,pLabel)
+C_InitToken(self,slotID,pPin,pLabel)
 	Crypt::Cryptoki::Raw  self
 	CK_SLOT_ID            slotID
 	char*                 pPin
-	CK_ULONG              ulPinLen
 	char*                 pLabel
 CODE:
-	RETVAL = self->function_list->C_InitToken(slotID,(CK_UTF8CHAR_PTR)pPin,ulPinLen,(CK_UTF8CHAR_PTR)pLabel);
+	RETVAL = self->function_list->C_InitToken(slotID,(CK_UTF8CHAR_PTR)pPin,strlen(pPin),(CK_UTF8CHAR_PTR)pLabel);
 OUTPUT:
 	RETVAL
 
 
 CK_RV
-C_InitPIN(self,hSession,pPin,ulPinLen)
+C_InitPIN(self,hSession,pPin)
 	Crypt::Cryptoki::Raw  self
 	CK_SESSION_HANDLE     hSession
 	char*                 pPin
-	CK_ULONG              ulPinLen
 CODE:
-	RETVAL = self->function_list->C_InitPIN(hSession,(CK_UTF8CHAR_PTR)pPin,ulPinLen);
+	RETVAL = self->function_list->C_InitPIN(hSession,(CK_UTF8CHAR_PTR)pPin,strlen(pPin));
 OUTPUT:
 	RETVAL
 
 
 CK_RV
-C_SetPIN(self,hSession,pOldPin,ulOldLen,pNewPin,ulNewLen)
+C_SetPIN(self,hSession,pOldPin,pNewPin)
 	Crypt::Cryptoki::Raw  self
 	CK_SESSION_HANDLE     hSession
 	char*                 pOldPin
-	CK_ULONG              ulOldLen
 	char*                 pNewPin
-	CK_ULONG              ulNewLen
 CODE:
 	RETVAL = self->function_list->C_SetPIN(
 		hSession,
-		(CK_UTF8CHAR_PTR)pOldPin,ulOldLen,
-		(CK_UTF8CHAR_PTR)pNewPin,ulNewLen
+		(CK_UTF8CHAR_PTR)pOldPin,strlen(pOldPin),
+		(CK_UTF8CHAR_PTR)pNewPin,strlen(pNewPin)
 	);
 OUTPUT:
 	RETVAL

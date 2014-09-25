@@ -386,7 +386,6 @@ C_OpenSession(self,slotID,flags,phSession)
 	CK_FLAGS              flags
 # CK_VOID_PTR           pApplication
 # CK_NOTIFY             Notify
-#	CK_SESSION_HANDLE_PTR phSession
 	SVREF                 phSession
 CODE:
 	// TODO: pass perl callback to wrapper and call it there
@@ -575,7 +574,7 @@ C_Encrypt(self,hSession,pData,ulDataLen,pEncryptedData,ulEncryptedDataLen)
 	CK_SESSION_HANDLE     hSession
 	char*                 pData
 	CK_ULONG              ulDataLen
-	SV*                   pEncryptedData
+	SVREF                 pEncryptedData
 	CK_ULONG              ulEncryptedDataLen
 CODE:
 	RETVAL = self->function_list->C_Encrypt(hSession,(CK_BYTE_PTR)pData,ulDataLen,
@@ -587,7 +586,8 @@ CODE:
 			_pEncryptedData,&ulEncryptedDataLen);
 
 		if ( RETVAL==CKR_OK ) {
-			*pEncryptedData = *newSVpv((char*)_pEncryptedData,ulEncryptedDataLen);
+			// important: use explicit length because of NUL bytes
+			sv_setpvn(pEncryptedData,(char*)_pEncryptedData,ulEncryptedDataLen);
 		}
 	}
 OUTPUT:
@@ -602,7 +602,7 @@ C_EncryptUpdate(self,hSession,pPart,ulPartLen,pEncryptedPart,ulEncryptedPartLen)
 	CK_SESSION_HANDLE     hSession
 	char*                 pPart
 	CK_ULONG              ulPartLen
-	SV*                   pEncryptedPart
+	SVREF                 pEncryptedPart
 	CK_ULONG              ulEncryptedPartLen
 CODE:
 	CK_BYTE_PTR _pEncryptedPart;
@@ -613,7 +613,7 @@ CODE:
 	);
 	
 	if ( RETVAL==CKR_OK ) {
-		*pEncryptedPart = *newSVpv((char*)_pEncryptedPart,ulEncryptedPartLen);
+		sv_setpvn(pEncryptedPart,(char*)_pEncryptedPart,ulEncryptedPartLen);
 	}
 OUTPUT:
 	RETVAL
@@ -625,7 +625,7 @@ CK_RV
 C_EncryptFinal(self,hSession,pEncryptedPart,ulEncryptedPartLen)
 	Crypt::Cryptoki::Raw  self
 	CK_SESSION_HANDLE     hSession
-	SV*                   pEncryptedPart
+	SVREF                 pEncryptedPart
 	CK_ULONG              ulEncryptedPartLen
 CODE:
 	CK_BYTE_PTR _pEncryptedPart;
@@ -636,7 +636,7 @@ CODE:
 	);
 	
 	if ( RETVAL==CKR_OK ) {
-		*pEncryptedPart = *newSVpv((char*)_pEncryptedPart,ulEncryptedPartLen);
+		sv_setpvn(pEncryptedPart,(char*)_pEncryptedPart,ulEncryptedPartLen);
 	}
 OUTPUT:
 	RETVAL
@@ -683,7 +683,7 @@ CODE:
 			_pData,&ulDataLen);
 
 		if ( RETVAL==CKR_OK ) {
-			*pData = *newSVpv((char*)_pData, ulDataLen);
+			sv_setpvn(pData,(char*)_pData, ulDataLen);
 		}
 	}
 OUTPUT:
@@ -721,7 +721,7 @@ C_Digest(self,hSession,pData,ulDataLen,pDigest,ulDigestLen)
 	CK_SESSION_HANDLE     hSession
 	char*                 pData
 	CK_ULONG              ulDataLen
-	SV*                   pDigest
+	SVREF                 pDigest
 	CK_ULONG              ulDigestLen
 CODE:
 	RETVAL = self->function_list->C_Digest(hSession,(CK_BYTE_PTR)pData,ulDataLen,
@@ -733,7 +733,7 @@ CODE:
 			_pDigest,&ulDigestLen);
 
 		if ( RETVAL==CKR_OK ) {
-			*pDigest = *newSVpv((char*)_pDigest, ulDigestLen);
+			sv_setpvn(pDigest,(char*)_pDigest, ulDigestLen);
 		}
 	}
 OUTPUT:
@@ -773,7 +773,7 @@ C_Sign(self,hSession,pData,ulDataLen,pSignature,ulSignatureLen)
 	CK_SESSION_HANDLE     hSession
 	char*                 pData
 	CK_ULONG              ulDataLen
-	SV*                   pSignature
+	SVREF                 pSignature
 	CK_ULONG              ulSignatureLen
 CODE:
 	RETVAL = self->function_list->C_Sign(hSession,(CK_BYTE_PTR)pData,ulDataLen,
@@ -785,7 +785,8 @@ CODE:
 			_pSignature,&ulSignatureLen);
 
 		if ( RETVAL==CKR_OK ) {
-			*pSignature = *newSVpv((char*)_pSignature, ulSignatureLen);
+			// *pSignature = *newSVpv((char*)_pSignature, ulSignatureLen);
+			sv_setpvn(pSignature,(char*)_pSignature, ulSignatureLen);
 		}
 	}
 OUTPUT:
@@ -934,7 +935,7 @@ C_WrapKey(self,hSession,pMechanism, \
 	AV*                   pMechanism
 	CK_OBJECT_HANDLE      hWrappingKey
 	CK_OBJECT_HANDLE      hKey
-	SV*                   pWrappedKey
+	SVREF                 pWrappedKey
 	CK_ULONG              ulWrappedKeyLen
 CODE:
 	CK_MECHANISM _pMechanism;
@@ -965,7 +966,7 @@ CODE:
 		);
 		
 		if ( RETVAL==CKR_OK ) {
-			*pWrappedKey = *newSVpv((char*)_pWrappedKey, ulWrappedKeyLen);
+			sv_setpvn(pWrappedKey,(char*)_pWrappedKey, ulWrappedKeyLen);
 		}
 	}
 OUTPUT:
@@ -998,17 +999,18 @@ CK_RV
 C_GenerateRandom(self,hSession,pRandomData,ulRandomLen)
 	Crypt::Cryptoki::Raw  self
 	CK_SESSION_HANDLE     hSession
-	SV*                   pRandomData
+	SVREF                 pRandomData
 	CK_ULONG              ulRandomLen
 CODE:
 	CK_BYTE_PTR _pRandomData;
 	Newx(_pRandomData,ulRandomLen,CK_BYTE);
 	RETVAL = self->function_list->C_GenerateRandom(hSession,_pRandomData,ulRandomLen);
 	if ( RETVAL==CKR_OK ) {
-		*pRandomData = *newSVpv((char*)_pRandomData, ulRandomLen);
+		sv_setpvn(pRandomData,(char*)_pRandomData, ulRandomLen);
 	}
 OUTPUT:
 	RETVAL
+	pRandomData
 
 
 ################################################################################

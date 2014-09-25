@@ -11,36 +11,36 @@ ok $f, 'load';
 
 is $f->C_Initialize, CKR_OK, 'C_Initialize';
 
-my $info = {};
-is $f->C_GetInfo($info), CKR_OK, 'C_GetInfo';
-diag explain $info;
+my %info;
+is $f->C_GetInfo(\%info), CKR_OK, 'C_GetInfo';
+explain \%info;
 
-my $slots = [];
-is $f->C_GetSlotList(1,$slots), CKR_OK, 'C_GetSlotList';
+my @slots;
+is $f->C_GetSlotList(1,\@slots), CKR_OK, 'C_GetSlotList';
 
-for my $id ( @$slots ) {
+for my $id ( @slots ) {
 	diag 'slotID: ', $id;
-	my $slotInfo = {};
-	is $f->C_GetSlotInfo($id,$slotInfo), CKR_OK, 'C_GetSlotInfo';
-	diag explain $slotInfo;
+	my %slotInfo;
+	is $f->C_GetSlotInfo($id,\%slotInfo), CKR_OK, 'C_GetSlotInfo';
+	explain \%slotInfo;
 
-	my $tokenInfo = {};
-	is $f->C_GetTokenInfo($id,$tokenInfo), CKR_OK, 'C_GetTokenInfo';
-	diag explain $tokenInfo;
+	my %tokenInfo;
+	is $f->C_GetTokenInfo($id,\%tokenInfo), CKR_OK, 'C_GetTokenInfo';
+	explain \%tokenInfo;
 }
 
 my $session;
 is rv_to_str($f->C_OpenSession(0,CKF_SERIAL_SESSION|CKF_RW_SESSION,\$session)), 'CKR_OK', 'C_OpenSession';
 diag $session;
 
-my $sessionInfo = {};
-is $f->C_GetSessionInfo($session, $sessionInfo), CKR_OK, 'C_GetSessionInfo';
-diag explain $sessionInfo;
-diag 'CKS_RO_PUBLIC_SESSION' if $sessionInfo->{state} & CKS_RO_PUBLIC_SESSION;
-diag 'CKS_RO_USER_FUNCTIONS' if $sessionInfo->{state} & CKS_RO_USER_FUNCTIONS;
-diag 'CKS_RW_PUBLIC_SESSION' if $sessionInfo->{state} & CKS_RW_PUBLIC_SESSION;
-diag 'CKS_RW_USER_FUNCTIONS' if $sessionInfo->{state} & CKS_RW_USER_FUNCTIONS;
-diag 'CKS_RW_SO_FUNCTIONS'   if $sessionInfo->{state} & CKS_RW_SO_FUNCTIONS;
+my %sessionInfo;
+is $f->C_GetSessionInfo($session, \%sessionInfo), CKR_OK, 'C_GetSessionInfo';
+explain \%sessionInfo;
+diag 'CKS_RO_PUBLIC_SESSION' if $sessionInfo{state} & CKS_RO_PUBLIC_SESSION;
+diag 'CKS_RO_USER_FUNCTIONS' if $sessionInfo{state} & CKS_RO_USER_FUNCTIONS;
+diag 'CKS_RW_PUBLIC_SESSION' if $sessionInfo{state} & CKS_RW_PUBLIC_SESSION;
+diag 'CKS_RW_USER_FUNCTIONS' if $sessionInfo{state} & CKS_RW_USER_FUNCTIONS;
+diag 'CKS_RW_SO_FUNCTIONS'   if $sessionInfo{state} & CKS_RW_SO_FUNCTIONS;
 
 is rv_to_str($f->C_Login($session, CKU_USER, '1234')), 'CKR_OK', 'C_Login';
 
@@ -85,8 +85,8 @@ is rv_to_str($f->C_GenerateKeyPair(
 	$private_key
 )), 'CKR_OK', 'C_GenerateKeyPair';
 
-diag $public_key;
-diag $private_key;
+diag 'public key: ', $public_key;
+diag 'private key: ', $private_key;
 
 
 is rv_to_str($f->C_EncryptInit(
@@ -102,10 +102,12 @@ is rv_to_str($f->C_Encrypt(
 	$session, 
 	$plain_text,
 	length($plain_text),
-	$encrypted_text,
+	\$encrypted_text,
 	$encrypted_text_len
 )), 'CKR_OK', 'C_Encrypt';
-diag unpack('H*',$encrypted_text);
+diag 'encrypted: ', unpack('H*',$encrypted_text);
+diag 'encrypted length:', $encrypted_text_len;
+diag 'strlen: ', length($encrypted_text);
 
 is rv_to_str($f->C_DecryptInit(
 	$session, 
@@ -134,13 +136,13 @@ is rv_to_str($f->C_SignInit(
 	$private_key, 
 )), 'CKR_OK', 'C_SignInit';
 
-my $signature = '';
+my $signature;
 my $signature_len = 0;
 is rv_to_str($f->C_Sign(
 	$session, 
 	$plain_text,
 	length($plain_text),
-	$signature,
+	\$signature,
 	$signature_len,
 )), 'CKR_OK', 'C_Sign';
 diag unpack('H*',$signature);

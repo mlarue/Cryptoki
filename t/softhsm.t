@@ -2,12 +2,11 @@ use Test::Most 'die';
 
 use Crypt::Cryptoki::Raw;
 use Crypt::Cryptoki::Constant qw(:all);
+use YAML::Tiny;
 
-my $f = Crypt::Cryptoki::Raw->new('/usr/lib64/softhsm/libsofthsm.so');
-#my $f = Crypt::Cryptoki::Raw->new('/usr/lib64/pkcs11/gnome-keyring-pkcs11.so');
-#my $f = Crypt::Cryptoki::Raw->new('/usr/lib64/pkcs11/opensc-pkcs11.so');
-
-ok $f, 'load';
+my $cfg = YAML::Tiny->read('config.yml');
+diag 'using: ', $cfg->[0]->{library};
+ok my $f = Crypt::Cryptoki::Raw->new($cfg->[0]->{library});
 
 is $f->C_Initialize, CKR_OK, 'C_Initialize';
 

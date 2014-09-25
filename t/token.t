@@ -1,18 +1,25 @@
-use Test::Most;
-die_on_fail;
+use Test::Most 'die';
 
 use Crypt::Cryptoki::Raw;
 use Crypt::Cryptoki::Constant qw(:all);
+use YAML::Tiny;
 
-ok my $raw = Crypt::Cryptoki::Raw->new('/usr/lib64/softhsm/libsofthsm.so');
-
+my $cfg = YAML::Tiny->read('config.yml');
+diag 'using: ', $cfg->[0]->{library};
+ok my $raw = Crypt::Cryptoki::Raw->new($cfg->[0]->{library});
 is($raw->C_Initialize(), CKR_OK, 'C_Initialize');
 
-#my $slot_id;
-#is(rv_to_str($raw->C_WaitForSlotEvent(CKF_DONT_BLOCK, $slot_id)), 'CKR_OK', 'C_WaitForSlotEvent');
+my $slot_id = -1;
+while ( $slot_id < 0 ) {
+	$raw->C_WaitForSlotEvent(CKF_DONT_BLOCK, \$slot_id);
+	diag 'slot_id: ', $slot_id;
+	sleep 1;
+}
+
+#is(rv_to_str($raw->C_WaitForSlotEvent(CKF_DONT_BLOCK, \$slot_id)), 'CKR_OK', 'C_WaitForSlotEvent');
 #diag 'slot_id: ', $slot_id;
 
-my $slot_id = 0;
+#my $slot_id = 0;
 my $mechanisms = [];
 is(rv_to_str($raw->C_GetMechanismList($slot_id,$mechanisms)), 'CKR_OK', 'C_GetMechanismList');
 #explain [ map { ckm_to_str($_) } @$mechanisms ];
